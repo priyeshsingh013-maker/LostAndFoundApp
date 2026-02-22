@@ -16,8 +16,7 @@ namespace LostAndFoundApp.Data
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Apply any pending migrations automatically on startup
-            await context.Database.MigrateAsync();
+            // Migrations are now handled globally in Program.cs
 
             // Seed roles
             string[] roles = { "SuperAdmin", "Supervisor", "User" };

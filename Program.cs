@@ -82,6 +82,13 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+// --- Apply Migrations on Startup ---
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await context.Database.MigrateAsync();
+}
+
 // --- Seed database on startup ---
 if (Environment.GetEnvironmentVariable("SEED_DATABASE") == "true" || app.Environment.IsDevelopment())
 {
