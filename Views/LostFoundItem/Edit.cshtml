@@ -1,0 +1,148 @@
+@model LostAndFoundApp.ViewModels.LostFoundItemEditViewModel
+@{
+    ViewData["Title"] = "Edit Record #" + Model.TrackingId;
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-pencil-square"></i> Edit Record #@Model.TrackingId</h2>
+    <div class="page-header-actions">
+        <a href="@Url.Action("Details", "LostFoundItem", new { id = Model.TrackingId })" role="button" class="outline"><i class="bi bi-eye"></i> View</a>
+    </div>
+</div>
+
+<form asp-action="Edit" asp-controller="LostFoundItem" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="TrackingId" />
+    <input type="hidden" asp-for="CreatedBy" />
+    <input type="hidden" asp-for="CreatedDateTime" />
+    <input type="hidden" asp-for="ExistingPhotoPath" />
+    <input type="hidden" asp-for="ExistingAttachmentPath" />
+    <div asp-validation-summary="ModelOnly" role="alert" data-variant="error"></div>
+
+    <article class="card mb-4">
+        <header><h3>Item Information</h3></header>
+        <div class="form-row-3">
+            <label data-field>
+                Date Found <strong>*</strong>
+                <input asp-for="DateFound" type="date" required />
+                <span asp-validation-for="DateFound" class="field-validation-error"></span>
+            </label>
+            <div data-field>
+                <label>Item Type <strong>*</strong></label>
+                <div class="inline-add-wrap">
+                    <select asp-for="ItemId" asp-items="Model.Items"><option value="">-- Select --</option></select>
+                    <button type="button" class="outline small" onclick="inlineAdd('Item', 'ItemId')" title="Add new"><i class="bi bi-plus"></i></button>
+                </div>
+                <span asp-validation-for="ItemId" class="field-validation-error"></span>
+            </div>
+            <div data-field>
+                <label>Status <strong>*</strong></label>
+                <div class="inline-add-wrap">
+                    <select asp-for="StatusId" asp-items="Model.Statuses"><option value="">-- Select --</option></select>
+                    <button type="button" class="outline small" onclick="inlineAdd('Status', 'StatusId')" title="Add new"><i class="bi bi-plus"></i></button>
+                </div>
+                <span asp-validation-for="StatusId" class="field-validation-error"></span>
+            </div>
+        </div>
+        <div class="form-row-3">
+            <label data-field>
+                Location Found <strong>*</strong>
+                <input asp-for="LocationFound" placeholder="Where was it found?" required />
+                <span asp-validation-for="LocationFound" class="field-validation-error"></span>
+            </label>
+            <label data-field>
+                Status Date
+                <input asp-for="StatusDate" type="date" />
+            </label>
+            <div data-field>
+                <label>Found By</label>
+                <div class="inline-add-wrap">
+                    <select asp-for="FoundById" asp-items="Model.FoundByNames"><option value="">-- Select --</option></select>
+                    <button type="button" class="outline small" onclick="inlineAdd('FoundByName', 'FoundById')" title="Add new"><i class="bi bi-plus"></i></button>
+                </div>
+            </div>
+        </div>
+        <label data-field>
+            Description
+            <textarea asp-for="Description" rows="3" placeholder="Describe the item..."></textarea>
+        </label>
+    </article>
+
+    <article class="card mb-4">
+        <header><h3>Transport &amp; Storage</h3></header>
+        <div class="form-row-3">
+            <div data-field>
+                <label>Route #</label>
+                <div class="inline-add-wrap">
+                    <select asp-for="RouteId" asp-items="Model.Routes"><option value="">-- Select --</option></select>
+                    <button type="button" class="outline small" onclick="inlineAdd('Route', 'RouteId')" title="Add new"><i class="bi bi-plus"></i></button>
+                </div>
+            </div>
+            <div data-field>
+                <label>Vehicle #</label>
+                <div class="inline-add-wrap">
+                    <select asp-for="VehicleId" asp-items="Model.Vehicles"><option value="">-- Select --</option></select>
+                    <button type="button" class="outline small" onclick="inlineAdd('Vehicle', 'VehicleId')" title="Add new"><i class="bi bi-plus"></i></button>
+                </div>
+            </div>
+            <div data-field>
+                <label>Storage Location</label>
+                <div class="inline-add-wrap">
+                    <select asp-for="StorageLocationId" asp-items="Model.StorageLocations"><option value="">-- Select --</option></select>
+                    <button type="button" class="outline small" onclick="inlineAdd('StorageLocation', 'StorageLocationId')" title="Add new"><i class="bi bi-plus"></i></button>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <article class="card mb-4">
+        <header><h3>Claim &amp; Notes</h3></header>
+        <div class="form-row-2">
+            <label data-field>
+                Claimed By
+                <input asp-for="ClaimedBy" placeholder="Name of person who claimed" />
+            </label>
+            <label data-field>
+                Notes
+                <textarea asp-for="Notes" rows="3" placeholder="Additional notes..."></textarea>
+            </label>
+        </div>
+    </article>
+
+    <article class="card mb-4">
+        <header><h3>Uploads</h3></header>
+        <div class="form-row-2">
+            <div data-field>
+                <label>Photo</label>
+                @if (!string.IsNullOrEmpty(Model.ExistingPhotoPath))
+                {
+                    <div class="mb-2">
+                        <img src="@Url.Action("DownloadPhoto", "LostFoundItem", new { id = Model.TrackingId })" alt="Current photo" class="preview-thumb" />
+                    </div>
+                }
+                <input asp-for="PhotoFile" type="file" accept=".jpg,.jpeg,.png,.gif" />
+                <small data-hint>Upload new to replace existing</small>
+            </div>
+            <div data-field>
+                <label>Attachment</label>
+                @if (!string.IsNullOrEmpty(Model.ExistingAttachmentPath))
+                {
+                    <div class="mb-2">
+                        <a href="@Url.Action("DownloadAttachment", "LostFoundItem", new { id = Model.TrackingId })"><i class="bi bi-paperclip"></i> Current attachment</a>
+                    </div>
+                }
+                <input asp-for="AttachmentFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png" />
+                <small data-hint>Upload new to replace existing</small>
+            </div>
+        </div>
+    </article>
+
+    <footer class="form-actions">
+        <button type="submit"><i class="bi bi-save"></i> Update Record</button>
+        <a href="@Url.Action("Details", "LostFoundItem", new { id = Model.TrackingId })" role="button" class="outline">Cancel</a>
+    </footer>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

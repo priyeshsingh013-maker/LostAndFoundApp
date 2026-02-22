@@ -1,0 +1,66 @@
+@model LostAndFoundApp.ViewModels.CreateUserViewModel
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-person-plus"></i> Create User</h2>
+</div>
+
+<article class="card" style="max-width: 600px;">
+    <form asp-action="Create" asp-controller="UserManagement" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" role="alert" data-variant="error"></div>
+
+        <div class="form-row-2">
+            <label data-field>
+                Username <strong>*</strong>
+                <input asp-for="UserName" placeholder="Enter username" required autofocus />
+                <span asp-validation-for="UserName" class="field-validation-error"></span>
+            </label>
+            <label data-field>
+                Display Name
+                <input asp-for="DisplayName" placeholder="Full name" />
+            </label>
+        </div>
+
+        <label data-field>
+            Email <strong>*</strong>
+            <input asp-for="Email" type="email" placeholder="user@example.com" required />
+            <span asp-validation-for="Email" class="field-validation-error"></span>
+        </label>
+
+        <div class="form-row-2">
+            <label data-field>
+                Temporary Password <strong>*</strong>
+                <input asp-for="Password" type="password" placeholder="Min 8 characters" required />
+                <span asp-validation-for="Password" class="field-validation-error"></span>
+            </label>
+            <label data-field>
+                Confirm Password <strong>*</strong>
+                <input asp-for="ConfirmPassword" type="password" placeholder="Confirm password" required />
+                <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
+            </label>
+        </div>
+
+        <div data-field>
+            <label>Role <strong>*</strong></label>
+            <select asp-for="Role" required>
+                <option value="">-- Select Role --</option>
+                <option value="User">User</option>
+                <option value="Supervisor">Supervisor</option>
+                <option value="SuperAdmin">Super Admin</option>
+            </select>
+            <span asp-validation-for="Role" class="field-validation-error"></span>
+        </div>
+
+        <footer class="form-actions">
+            <button type="submit"><i class="bi bi-save"></i> Create User</button>
+            <a href="@Url.Action("Index", "UserManagement")" role="button" class="outline">Cancel</a>
+        </footer>
+    </form>
+</article>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

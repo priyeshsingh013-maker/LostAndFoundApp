@@ -1,0 +1,72 @@
+﻿@model LostAndFoundApp.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+    <div class="page-header-actions">
+        <a href="@Url.Action("Create", "LostFoundItem")" role="button"><i class="bi bi-plus-circle"></i> New Record</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <article class="card stat-card total">
+        <div class="stat-value">@Model.TotalItems</div>
+        <div class="stat-label">Total Records</div>
+    </article>
+    <article class="card stat-card found">
+        <div class="stat-value">@Model.FoundCount</div>
+        <div class="stat-label">Found</div>
+    </article>
+    <article class="card stat-card claimed">
+        <div class="stat-value">@Model.ClaimedCount</div>
+        <div class="stat-label">Claimed</div>
+    </article>
+    <article class="card stat-card stored">
+        <div class="stat-value">@Model.StoredCount</div>
+        <div class="stat-label">Stored</div>
+    </article>
+</div>
+
+<article class="card">
+    <header><h3>Recent Records</h3></header>
+    @if (Model.RecentRecords.Any())
+    {
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date Found</th>
+                        <th>Item</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Days</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RecentRecords)
+                    {
+                        <tr>
+                            <td><strong>@item.TrackingId</strong></td>
+                            <td>@item.DateFound.ToString("MM/dd/yy")</td>
+                            <td>@item.ItemName</td>
+                            <td>@item.LocationFound</td>
+                            <td><span class="badge @item.StatusName.ToLower()">@item.StatusName</span></td>
+                            <td>@item.DaysSinceFound</td>
+                            <td class="table-actions">
+                                <a href="@Url.Action("Details", "LostFoundItem", new { id = item.TrackingId })" role="button" class="ghost small" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-light p-4">No records found. Create your first record to get started.</p>
+    }
+</article>

@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div style="text-align: center; padding: var(--space-6) var(--space-4);">
+    <i class="bi bi-shield-x" style="font-size: 4rem; color: hsl(0, 72%, 51%); display: block; margin-bottom: var(--space-3);"></i>
+    <h1>403 — Access Denied</h1>
+    <p class="text-light">You don't have permission to access this page.</p>
+    <a href="@Url.Action("Index", "Home")" role="button" class="outline mt-4"><i class="bi bi-house"></i> Back to Dashboard</a>
+</div>

@@ -1,0 +1,121 @@
+@model LostAndFoundApp.ViewModels.LostFoundItemDetailViewModel
+@{
+    ViewData["Title"] = "Record #" + Model.TrackingId;
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-info-circle"></i> Record #@Model.TrackingId</h2>
+    <div class="page-header-actions">
+        <a href="@Url.Action("Edit", "LostFoundItem", new { id = Model.TrackingId })" role="button"><i class="bi bi-pencil"></i> Edit</a>
+        <a href="@Url.Action("Search", "LostFoundItem")" role="button" class="outline"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+</div>
+
+<article class="card mb-4">
+    <header><h3>Item Information</h3></header>
+    <div class="detail-grid">
+        <div class="detail-item">
+            <span class="detail-label">Tracking ID</span>
+            <span class="detail-value"><strong>@Model.TrackingId</strong></span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Date Found</span>
+            <span class="detail-value">@Model.DateFound.ToString("MMMM dd, yyyy")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Item Type</span>
+            <span class="detail-value">@Model.ItemName</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Location Found</span>
+            <span class="detail-value">@Model.LocationFound</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value"><span class="badge @Model.StatusName?.ToLower()">@Model.StatusName</span></span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Status Date</span>
+            <span class="detail-value">@(Model.StatusDate?.ToString("MMMM dd, yyyy") ?? "—")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Days Since Found</span>
+            <span class="detail-value">@Model.DaysSinceFound days</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Found By</span>
+            <span class="detail-value">@(Model.FoundByName ?? "—")</span>
+        </div>
+    </div>
+</article>
+
+<article class="card mb-4">
+    <header><h3>Transport &amp; Storage</h3></header>
+    <div class="detail-grid">
+        <div class="detail-item">
+            <span class="detail-label">Route #</span>
+            <span class="detail-value">@(Model.RouteName ?? "—")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Vehicle #</span>
+            <span class="detail-value">@(Model.VehicleName ?? "—")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Storage Location</span>
+            <span class="detail-value">@(Model.StorageLocationName ?? "—")</span>
+        </div>
+    </div>
+</article>
+
+<article class="card mb-4">
+    <header><h3>Details &amp; Claims</h3></header>
+    <div class="detail-grid">
+        <div class="detail-item" style="grid-column: span 2;">
+            <span class="detail-label">Description</span>
+            <span class="detail-value">@(Model.Description ?? "—")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Claimed By</span>
+            <span class="detail-value">@(Model.ClaimedBy ?? "—")</span>
+        </div>
+        <div class="detail-item" style="grid-column: span 2;">
+            <span class="detail-label">Notes</span>
+            <span class="detail-value">@(Model.Notes ?? "—")</span>
+        </div>
+    </div>
+</article>
+
+@if (!string.IsNullOrEmpty(Model.PhotoPath) || !string.IsNullOrEmpty(Model.AttachmentPath))
+{
+    <article class="card mb-4">
+        <header><h3>Attachments</h3></header>
+        <div class="hstack">
+            @if (!string.IsNullOrEmpty(Model.PhotoPath))
+            {
+                <a href="@Url.Action("DownloadPhoto", "LostFoundItem", new { id = Model.TrackingId })">
+                    <img src="@Url.Action("DownloadPhoto", "LostFoundItem", new { id = Model.TrackingId })" alt="Photo" class="preview-thumb" />
+                </a>
+            }
+            @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+            {
+                <a href="@Url.Action("DownloadAttachment", "LostFoundItem", new { id = Model.TrackingId })" role="button" class="outline">
+                    <i class="bi bi-paperclip"></i> Download Attachment
+                </a>
+            }
+        </div>
+    </article>
+}
+
+<article class="card">
+    <header><h3>Record Metadata</h3></header>
+    <div class="detail-grid">
+        <div class="detail-item">
+            <span class="detail-label">Created By</span>
+            <span class="detail-value">@(Model.CreatedBy ?? "—")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Created On</span>
+            <span class="detail-value">@Model.CreatedDateTime.ToString("MMMM dd, yyyy hh:mm tt")</span>
+        </div>
+    </div>
+</article>

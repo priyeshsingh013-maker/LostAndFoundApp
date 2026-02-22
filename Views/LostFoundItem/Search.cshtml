@@ -1,0 +1,129 @@
+@model LostAndFoundApp.ViewModels.SearchViewModel
+@{
+    ViewData["Title"] = "Search Records";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-search"></i> Search Records</h2>
+    <div class="page-header-actions">
+        <a href="@Url.Action("Create", "LostFoundItem")" role="button"><i class="bi bi-plus-circle"></i> New Record</a>
+    </div>
+</div>
+
+<details class="card mb-4" @(Model.TrackingId.HasValue || Model.ItemId.HasValue || Model.StatusId.HasValue || Model.DateFoundFrom.HasValue ? "open" : "")>
+    <summary style="cursor: pointer; font-weight: 600;"><i class="bi bi-funnel"></i> Filters</summary>
+
+    <form asp-action="Search" asp-controller="LostFoundItem" method="get" class="mt-2">
+        <div class="form-row-3">
+            <label data-field>
+                Tracking ID
+                <input asp-for="TrackingId" type="number" placeholder="Enter ID..." />
+            </label>
+            <label data-field>
+                Date From
+                <input asp-for="DateFoundFrom" type="date" />
+            </label>
+            <label data-field>
+                Date To
+                <input asp-for="DateFoundTo" type="date" />
+            </label>
+        </div>
+        <div class="form-row-3">
+            <div data-field>
+                <label>Item Type</label>
+                <select asp-for="ItemId" asp-items="Model.Items"><option value="">All Items</option></select>
+            </div>
+            <div data-field>
+                <label>Status</label>
+                <select asp-for="StatusId" asp-items="Model.Statuses"><option value="">All Statuses</option></select>
+            </div>
+            <div data-field>
+                <label>Route</label>
+                <select asp-for="RouteId" asp-items="Model.Routes"><option value="">All Routes</option></select>
+            </div>
+        </div>
+        <div class="form-row-3">
+            <div data-field>
+                <label>Vehicle</label>
+                <select asp-for="VehicleId" asp-items="Model.Vehicles"><option value="">All Vehicles</option></select>
+            </div>
+            <div data-field>
+                <label>Storage Location</label>
+                <select asp-for="StorageLocationId" asp-items="Model.StorageLocations"><option value="">All Locations</option></select>
+            </div>
+            <div data-field>
+                <label>Found By</label>
+                <select asp-for="FoundById" asp-items="Model.FoundByNames"><option value="">All</option></select>
+            </div>
+        </div>
+        <div class="hstack mt-2">
+            <button type="submit"><i class="bi bi-search"></i> Search</button>
+            <a href="@Url.Action("Search", "LostFoundItem")" role="button" class="outline">Clear</a>
+            <a href="@Url.Action("PrintSearch", "LostFoundItem", new { Model.TrackingId, Model.DateFoundFrom, Model.DateFoundTo, Model.ItemId, Model.StatusId, Model.RouteId, Model.VehicleId, Model.StorageLocationId, Model.FoundById })" role="button" class="ghost" target="_blank"><i class="bi bi-printer"></i> Print</a>
+        </div>
+    </form>
+</details>
+
+<article class="card">
+    <header>
+        <h3>Results <span class="badge">@Model.TotalRecords</span></h3>
+    </header>
+    @if (Model.Results.Any())
+    {
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th><a class="sort-link" href="@Url.Action("Search", new { Model.TrackingId, Model.DateFoundFrom, Model.DateFoundTo, Model.ItemId, Model.StatusId, Model.RouteId, Model.VehicleId, Model.StorageLocationId, Model.FoundById, SortField = "TrackingId", SortOrder = Model.SortOrder == "asc" && Model.SortField == "TrackingId" ? "desc" : "asc", CurrentPage = 1 })">ID @(Model.SortField == "TrackingId" ? (Model.SortOrder == "asc" ? "↑" : "↓") : "")</a></th>
+                        <th><a class="sort-link" href="@Url.Action("Search", new { Model.TrackingId, Model.DateFoundFrom, Model.DateFoundTo, Model.ItemId, Model.StatusId, Model.RouteId, Model.VehicleId, Model.StorageLocationId, Model.FoundById, SortField = "DateFound", SortOrder = Model.SortOrder == "asc" && Model.SortField == "DateFound" ? "desc" : "asc", CurrentPage = 1 })">Date @(Model.SortField == "DateFound" ? (Model.SortOrder == "asc" ? "↑" : "↓") : "")</a></th>
+                        <th>Item</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Claimed By</th>
+                        <th>Days</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Results)
+                    {
+                        <tr>
+                            <td><strong>@item.TrackingId</strong></td>
+                            <td>@item.DateFound.ToString("MM/dd/yy")</td>
+                            <td>@item.ItemName</td>
+                            <td>@item.LocationFound</td>
+                            <td><span class="badge @item.StatusName?.ToLower()">@item.StatusName</span></td>
+                            <td>@item.ClaimedBy</td>
+                            <td>@item.DaysSinceFound</td>
+                            <td class="table-actions">
+                                <a href="@Url.Action("Details", "LostFoundItem", new { id = item.TrackingId })" role="button" class="ghost small" title="View" aria-label="View"><i class="bi bi-eye"></i></a>
+                                <a href="@Url.Action("Edit", "LostFoundItem", new { id = item.TrackingId })" role="button" class="ghost small" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <div class="pagination">
+                @for (int p = 1; p <= Model.TotalPages; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <span class="active">@p</span>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Search", new { Model.TrackingId, Model.DateFoundFrom, Model.DateFoundTo, Model.ItemId, Model.StatusId, Model.RouteId, Model.VehicleId, Model.StorageLocationId, Model.FoundById, Model.SortField, Model.SortOrder, CurrentPage = p })">@p</a>
+                    }
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-center text-light p-4">No records match your search criteria.</p>
+    }
+</article>

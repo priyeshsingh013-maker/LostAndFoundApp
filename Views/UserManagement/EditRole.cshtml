@@ -1,0 +1,43 @@
+@model LostAndFoundApp.ViewModels.EditUserRoleViewModel
+@{
+    ViewData["Title"] = "Edit Role";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-shield-check"></i> Edit Role</h2>
+</div>
+
+<article class="card" style="max-width: 500px;">
+    <header>
+        <h3>@Model.UserName</h3>
+        <p class="text-light">@Model.DisplayName · Current role: <span class="badge">@Model.CurrentRole</span></p>
+    </header>
+
+    <form asp-action="EditRole" asp-controller="UserManagement" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="UserName" />
+        <input type="hidden" asp-for="DisplayName" />
+        <input type="hidden" asp-for="CurrentRole" />
+        <div asp-validation-summary="ModelOnly" role="alert" data-variant="error"></div>
+
+        <div data-field>
+            <label>New Role <strong>*</strong></label>
+            <select asp-for="NewRole" required>
+                <option value="User">User</option>
+                <option value="Supervisor">Supervisor</option>
+                <option value="SuperAdmin">Super Admin</option>
+            </select>
+            <span asp-validation-for="NewRole" class="field-validation-error"></span>
+        </div>
+
+        <footer class="form-actions">
+            <button type="submit"><i class="bi bi-save"></i> Update Role</button>
+            <a href="@Url.Action("Index", "UserManagement")" role="button" class="outline">Cancel</a>
+        </footer>
+    </form>
+</article>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

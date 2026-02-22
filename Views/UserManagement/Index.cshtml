@@ -1,0 +1,52 @@
+@model IEnumerable<LostAndFoundApp.ViewModels.UserListViewModel>
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-people"></i> User Management</h2>
+    <div class="page-header-actions">
+        <a href="@Url.Action("Create", "UserManagement")" role="button"><i class="bi bi-person-plus"></i> Create User</a>
+        <a href="@Url.Action("AdGroups", "UserManagement")" role="button" class="outline"><i class="bi bi-diagram-3"></i> AD Groups</a>
+    </div>
+</div>
+
+<article class="card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Display Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td><strong>@user.UserName</strong></td>
+                        <td>@user.DisplayName</td>
+                        <td>@user.Email</td>
+                        <td><span class="badge">@user.Role</span></td>
+                        <td><span class="badge @(user.AccountType == "Active Directory" ? "secondary" : "outline")">@user.AccountType</span></td>
+                        <td><span class="badge @(user.IsActive ? "success" : "danger")">@(user.IsActive ? "Active" : "Inactive")</span></td>
+                        <td class="table-actions">
+                            <a href="@Url.Action("EditRole", "UserManagement", new { id = user.Id })" role="button" class="ghost small" title="Edit Role" aria-label="Edit Role"><i class="bi bi-shield-check"></i></a>
+                            <form asp-action="ToggleActive" asp-controller="UserManagement" asp-route-id="@user.Id" method="post" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="ghost small" title="@(user.IsActive ? "Deactivate" : "Activate")" aria-label="@(user.IsActive ? "Deactivate" : "Activate")">
+                                    <i class="bi bi-toggle-@(user.IsActive ? "on" : "off")"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</article>

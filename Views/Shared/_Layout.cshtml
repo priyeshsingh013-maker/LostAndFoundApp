@@ -1,0 +1,119 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<LostAndFoundApp.Models.ApplicationUser> SignInManager
+@inject UserManager<LostAndFoundApp.Models.ApplicationUser> UserManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] — Lost &amp; Found Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/@@knadh/oat/oat.min.css">
+    <script src="https://unpkg.com/@@knadh/oat/oat.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css">
+    @RenderSection("Styles", required: false)
+    <script>
+        // Prevent FOUC (Flash of Unstyled Theme)
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+        else document.documentElement.setAttribute('data-theme', 'light');
+    </script>
+</head>
+<body>
+@if (SignInManager.IsSignedIn(User))
+{
+    <div data-sidebar-layout>
+        <nav data-topnav>
+            <button data-sidebar-toggle aria-label="Toggle menu" class="outline small">☰</button>
+            <span><i class="bi bi-box-seam"></i> Lost &amp; Found</span>
+        </nav>
+        <aside data-sidebar>
+            <header class="sidebar-brand">
+                <i class="bi bi-box-seam"></i>
+                <span>Lost &amp; Found</span>
+            </header>
+            <nav>
+                <ul>
+                    <li><a href="@Url.Action("Index", "Home")" aria-current="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "page" : "false")"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li><a href="@Url.Action("Create", "LostFoundItem")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Create" && ViewContext.RouteData.Values["controller"]?.ToString() == "LostFoundItem" ? "page" : "false")"><i class="bi bi-plus-circle"></i> New Record</a></li>
+                    <li><a href="@Url.Action("Search", "LostFoundItem")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Search" && ViewContext.RouteData.Values["controller"]?.ToString() == "LostFoundItem" ? "page" : "false")"><i class="bi bi-search"></i> Search</a></li>
+
+                    @if (User.IsInRole("Supervisor") || User.IsInRole("SuperAdmin"))
+                    {
+                        <li>
+                            <details @(ViewContext.RouteData.Values["controller"]?.ToString() == "MasterData" ? "open" : "")>
+                                <summary><i class="bi bi-database-gear"></i> Master Data</summary>
+                                <ul>
+                                    <li><a href="@Url.Action("Items", "MasterData")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("Item") == true ? "page" : "false")">Items</a></li>
+                                    <li><a href="@Url.Action("Routes", "MasterData")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("Route") == true ? "page" : "false")">Routes</a></li>
+                                    <li><a href="@Url.Action("Vehicles", "MasterData")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("Vehicle") == true ? "page" : "false")">Vehicles</a></li>
+                                    <li><a href="@Url.Action("StorageLocations", "MasterData")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("StorageLocation") == true ? "page" : "false")">Storage Locations</a></li>
+                                    <li><a href="@Url.Action("Statuses", "MasterData")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("Status") == true ? "page" : "false")">Statuses</a></li>
+                                    <li><a href="@Url.Action("FoundByNames", "MasterData")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("FoundByName") == true ? "page" : "false")">Found By Names</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("SuperAdmin"))
+                    {
+                        <li>
+                            <details @(ViewContext.RouteData.Values["controller"]?.ToString() == "UserManagement" ? "open" : "")>
+                                <summary><i class="bi bi-people"></i> User Management</summary>
+                                <ul>
+                                    <li><a href="@Url.Action("Index", "UserManagement")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "page" : "false")">All Users</a></li>
+                                    <li><a href="@Url.Action("Create", "UserManagement")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Create" ? "page" : "false")">Create User</a></li>
+                                    <li><a href="@Url.Action("AdGroups", "UserManagement")" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "AdGroups" ? "page" : "false")">AD Groups &amp; Sync</a></li>
+                                </ul>
+                            </details>
+                        </li>
+                    }
+                </ul>
+            </nav>
+            <footer>
+                <div class="sidebar-user">
+                    <small><i class="bi bi-person-circle"></i> @User.Identity?.Name</small>
+                </div>
+                <div class="sidebar-actions">
+                    <a href="@Url.Action("ChangePassword", "Account")" class="ghost small" role="button" title="Change Password"><i class="bi bi-key"></i></a>
+                    <button class="ghost small" onclick="toggleTheme()" title="Toggle contrast"><i class="bi bi-circle-half"></i></button>
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="ghost small" data-variant="danger" title="Sign out"><i class="bi bi-box-arrow-right"></i></button>
+                    </form>
+                </div>
+            </footer>
+        </aside>
+        <main>
+            <div class="container main-content">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div role="alert" data-variant="success">
+                        <strong>Success!</strong> @TempData["SuccessMessage"]
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div role="alert" data-variant="error">
+                        <strong>Error!</strong> @TempData["ErrorMessage"]
+                    </div>
+                }
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+}
+else
+{
+    <main class="login-page">
+        @RenderBody()
+    </main>
+}
+
+<script src="~/js/site.js"></script>
+@RenderSection("Scripts", required: false)
+</body>
+</html>

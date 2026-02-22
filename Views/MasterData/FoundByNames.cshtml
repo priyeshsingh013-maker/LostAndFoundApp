@@ -1,0 +1,39 @@
+@model IEnumerable<LostAndFoundApp.Models.FoundByName>
+@{
+    ViewData["Title"] = "Found By Names";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-database-gear"></i> Found By Names</h2>
+    <div class="page-header-actions">
+        <a href="@Url.Action("CreateFoundByName", "MasterData")" role="button"><i class="bi bi-plus-circle"></i> Add Name</a>
+    </div>
+</div>
+
+<article class="card">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Name</td>
+                        <td><span class="badge @(item.IsActive ? "success" : "danger")">@(item.IsActive ? "Active" : "Inactive")</span></td>
+                        <td class="table-actions">
+                            <a href="@Url.Action("EditFoundByName", "MasterData", new { id = item.Id })" role="button" class="ghost small" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</article>

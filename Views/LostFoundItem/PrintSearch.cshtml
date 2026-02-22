@@ -1,0 +1,71 @@
+@model LostAndFoundApp.ViewModels.SearchViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost &amp; Found — Print Report</title>
+    <link rel="stylesheet" href="https://unpkg.com/@@knadh/oat/oat.min.css">
+    <style>
+        @@media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body>
+    <div class="print-report">
+        <header>
+            <h2>Lost &amp; Found Item Report</h2>
+            <p class="text-light">Generated @DateTime.Now.ToString("MMMM dd, yyyy hh:mm tt")</p>
+        </header>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: var(--space-3);">
+            <span>@Model.FilterSummary</span>
+            <span><strong>@Model.Results.Count</strong> record(s)</span>
+        </div>
+
+        <button class="outline small no-print" onclick="window.print()"><i>🖨</i> Print</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Item</th>
+                    <th>Location</th>
+                    <th>Route</th>
+                    <th>Vehicle</th>
+                    <th>Status</th>
+                    <th>Storage</th>
+                    <th>Found By</th>
+                    <th>Claimed By</th>
+                    <th>Days</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Results)
+                {
+                    <tr>
+                        <td>@item.TrackingId</td>
+                        <td>@item.DateFound.ToString("MM/dd/yy")</td>
+                        <td>@item.ItemName</td>
+                        <td>@item.LocationFound</td>
+                        <td>@item.RouteName</td>
+                        <td>@item.VehicleName</td>
+                        <td>@item.StatusName</td>
+                        <td>@item.StorageLocationName</td>
+                        <td>@item.FoundByName</td>
+                        <td>@item.ClaimedBy</td>
+                        <td>@item.DaysSinceFound</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <footer>
+            <p>Confidential — For internal use only</p>
+        </footer>
+    </div>
+</body>
+</html>

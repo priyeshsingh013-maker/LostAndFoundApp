@@ -1,0 +1,38 @@
+@model LostAndFoundApp.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<article class="card login-card">
+    <header style="text-align: center; border-bottom: none; padding-bottom: 0;">
+        <i class="bi bi-box-seam" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 12px; display: inline-block;"></i>
+        <h2 style="font-size: 1.8rem; letter-spacing: -0.04em;">Lost &amp; Found Tracker</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 8px;">Sign in to your account to continue</p>
+    </header>
+
+    <div style="padding: 24px;">
+        <form asp-action="Login" asp-controller="Account" method="post">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div asp-validation-summary="ModelOnly" role="alert" data-variant="error"></div>
+
+        <label data-field>
+            Username
+            <input asp-for="UserName" placeholder="Enter username" required autofocus />
+            <span asp-validation-for="UserName" class="field-validation-error"></span>
+        </label>
+
+        <label data-field>
+            Password
+            <input asp-for="Password" type="password" placeholder="Enter password" required />
+            <span asp-validation-for="Password" class="field-validation-error"></span>
+        </label>
+
+            <label data-field style="display: flex; align-items: center; gap: 8px; margin: 16px 0 28px 0; font-weight: 500;">
+                <input type="checkbox" asp-for="RememberMe" style="width: auto; margin: 0; box-shadow: none;" /> Remember me for 30 days
+            </label>
+
+            <button type="submit" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="bi bi-box-arrow-in-right"></i> Sign In</button>
+        </form>
+    </div>
+</article>

@@ -1,0 +1,72 @@
+@model IEnumerable<LostAndFoundApp.Models.AdGroup>
+@{
+    ViewData["Title"] = "AD Groups & Sync";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-diagram-3"></i> AD Groups &amp; Sync</h2>
+    <div class="page-header-actions">
+        <form asp-action="SyncNow" asp-controller="UserManagement" method="post" style="display: inline;">
+            @Html.AntiForgeryToken()
+            <button type="submit"><i class="bi bi-arrow-repeat"></i> Sync Now</button>
+        </form>
+    </div>
+</div>
+
+<div class="form-row-2">
+    <div>
+        <article class="card">
+            <header><h3>Configured Groups</h3></header>
+            @if (Model.Any())
+            {
+                <table>
+                    <thead><tr><th>Group Name</th><th>Date Added</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var group in Model)
+                        {
+                            <tr>
+                                <td><strong>@group.GroupName</strong></td>
+                                <td>@group.DateAdded.ToString("MM/dd/yyyy")</td>
+                                <td class="table-actions">
+                                    <form asp-action="RemoveAdGroup" asp-controller="UserManagement" asp-route-id="@group.Id" method="post" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="ghost small" data-variant="danger" title="Remove"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-center text-light p-4">No AD groups configured.</p>
+            }
+        </article>
+    </div>
+
+    <div class="vstack">
+        <article class="card">
+            <header><h3>Add Group</h3></header>
+            <form asp-action="AddAdGroup" asp-controller="UserManagement" method="post">
+                @Html.AntiForgeryToken()
+                <label data-field>
+                    AD Group Name
+                    <input name="groupName" placeholder="e.g. DOMAIN\GroupName" required autofocus />
+                </label>
+                <button type="submit" class="w-100"><i class="bi bi-plus-circle"></i> Add Group</button>
+            </form>
+        </article>
+
+        <article class="card">
+            <header><h3>How AD Sync Works</h3></header>
+            <ol>
+                <li>Add AD group names above</li>
+                <li>Click <strong>Sync Now</strong> to import members</li>
+                <li>Members are created as AD users with the <em>User</em> role</li>
+                <li>Existing users are updated (display name, active status)</li>
+                <li>Users removed from all groups are deactivated</li>
+            </ol>
+        </article>
+    </div>
+</div>
