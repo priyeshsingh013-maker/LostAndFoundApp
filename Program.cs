@@ -83,7 +83,10 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // --- Seed database on startup ---
-await DbInitializer.SeedAsync(app.Services);
+if (Environment.GetEnvironmentVariable("SEED_DATABASE") == "true" || app.Environment.IsDevelopment())
+{
+    await DbInitializer.SeedAsync(app.Services);
+}
 
 // --- HTTP pipeline ---
 if (app.Environment.IsDevelopment())
