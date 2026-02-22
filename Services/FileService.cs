@@ -25,7 +25,7 @@ namespace LostAndFoundApp.Services
         {
             var allowedExtensions = _config.GetSection("FileUpload:AllowedPhotoExtensions").Get<string[]>()
                 ?? new[] { ".jpg", ".jpeg", ".png", ".gif" };
-            var storagePath = _config["FileUpload:PhotoStoragePath"] ?? "C:\\SecureStorage\\Photos";
+            var storagePath = _config["FileUpload:PhotoStoragePath"] ?? "./SecureStorage/Photos";
             return await SaveFileAsync(file, storagePath, allowedExtensions);
         }
 
@@ -37,7 +37,7 @@ namespace LostAndFoundApp.Services
         {
             var allowedExtensions = _config.GetSection("FileUpload:AllowedAttachmentExtensions").Get<string[]>()
                 ?? new[] { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".txt", ".jpg", ".jpeg", ".png" };
-            var storagePath = _config["FileUpload:AttachmentStoragePath"] ?? "C:\\SecureStorage\\Attachments";
+            var storagePath = _config["FileUpload:AttachmentStoragePath"] ?? "./SecureStorage/Attachments";
             return await SaveFileAsync(file, storagePath, allowedExtensions);
         }
 
@@ -83,7 +83,7 @@ namespace LostAndFoundApp.Services
         /// </summary>
         public (FileStream? Stream, string ContentType)? GetPhoto(string fileName)
         {
-            var storagePath = _config["FileUpload:PhotoStoragePath"] ?? "C:\\SecureStorage\\Photos";
+            var storagePath = _config["FileUpload:PhotoStoragePath"] ?? "./SecureStorage/Photos";
             return GetFile(fileName, storagePath);
         }
 
@@ -92,7 +92,7 @@ namespace LostAndFoundApp.Services
         /// </summary>
         public (FileStream? Stream, string ContentType)? GetAttachment(string fileName)
         {
-            var storagePath = _config["FileUpload:AttachmentStoragePath"] ?? "C:\\SecureStorage\\Attachments";
+            var storagePath = _config["FileUpload:AttachmentStoragePath"] ?? "./SecureStorage/Attachments";
             return GetFile(fileName, storagePath);
         }
 
@@ -127,14 +127,14 @@ namespace LostAndFoundApp.Services
         public void DeletePhoto(string? fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName)) return;
-            var storagePath = _config["FileUpload:PhotoStoragePath"] ?? "C:\\SecureStorage\\Photos";
+            var storagePath = _config["FileUpload:PhotoStoragePath"] ?? "./SecureStorage/Photos";
             DeleteFile(fileName, storagePath);
         }
 
         public void DeleteAttachment(string? fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName)) return;
-            var storagePath = _config["FileUpload:AttachmentStoragePath"] ?? "C:\\SecureStorage\\Attachments";
+            var storagePath = _config["FileUpload:AttachmentStoragePath"] ?? "./SecureStorage/Attachments";
             DeleteFile(fileName, storagePath);
         }
 

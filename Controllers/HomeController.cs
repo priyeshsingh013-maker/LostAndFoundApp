@@ -36,21 +36,29 @@ namespace LostAndFoundApp.Controllers
                     .CountAsync(x => x.Status != null && x.Status.Name == "Stored"),
             };
 
-            vm.RecentRecords = await _context.LostFoundItems
+            var recentItems = await _context.LostFoundItems
                 .Include(x => x.Item)
                 .Include(x => x.Status)
                 .OrderByDescending(x => x.CreatedDateTime)
                 .Take(10)
-                .Select(x => new DashboardRecentItem
-                {
-                    TrackingId = x.TrackingId,
-                    DateFound = x.DateFound,
+                .Select(x => new {
+                    x.TrackingId,
+                    x.DateFound,
                     ItemName = x.Item != null ? x.Item.Name : "",
-                    LocationFound = x.LocationFound,
-                    StatusName = x.Status != null ? x.Status.Name : "",
-                    DaysSinceFound = (DateTime.Today - x.DateFound.Date).Days
+                    x.LocationFound,
+                    StatusName = x.Status != null ? x.Status.Name : ""
                 })
                 .ToListAsync();
+
+            vm.RecentRecords = recentItems.Select(x => new DashboardRecentItem
+            {
+                TrackingId = x.TrackingId,
+                DateFound = x.DateFound,
+                ItemName = x.ItemName,
+                LocationFound = x.LocationFound,
+                StatusName = x.StatusName,
+                DaysSinceFound = (DateTime.Today - x.DateFound.Date).Days
+            }).ToList();
 
             return View(vm);
         }

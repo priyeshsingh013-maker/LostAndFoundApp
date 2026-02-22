@@ -1,5 +1,5 @@
 /* ==========================================================
-   Lost & Found — Deep Premium Logic Theme
+   Lost & Found — Deep Premium Enterprise Theme
    ========================================================== */
 
 /* Typography & Base Reset */
@@ -19,21 +19,14 @@ button {
     */
 
     --bg-app: #f1f5f9;
-    /* Very subtle blue-grey background */
     --bg-surface: #ffffff;
-    /* Pure white cards */
     --bg-surface-hover: #f8fafc;
-    /* Card hover state */
 
     --border-subtle: #e2e8f0;
-    /* Soft dividers */
     --border-focus: #3b82f6;
-    /* Accent borders */
 
     --text-main: #0f172a;
-    /* Deep slate text */
     --text-muted: #64748b;
-    /* Muted slate */
 
     /* Primary Accent: Indigo/Blue */
     --accent: #4f46e5;
@@ -63,11 +56,19 @@ button {
     --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
     --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.06), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
     --shadow-elevation: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
-    /* Highest depth */
 
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 16px;
+
+    /* Spacing scale */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
 }
 
 [data-theme="dark"] {
@@ -123,6 +124,49 @@ h5 {
 }
 
 /* ==========================================================
+   Utility Classes
+   ========================================================== */
+
+.text-center { text-align: center; }
+.text-light { color: var(--text-muted); }
+.text-lighter { color: var(--text-muted); opacity: 0.7; }
+.text-danger { color: var(--danger-text); }
+.text-success { color: var(--success-text); }
+
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-5 { margin-bottom: var(--space-5); }
+
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-5 { margin-top: var(--space-5); }
+
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-5 { padding: var(--space-5); }
+
+.w-100 { width: 100%; }
+
+.hstack {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+}
+
+.vstack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* ==========================================================
    Sidebar & Layout Structure
    ========================================================== */
 
@@ -134,7 +178,6 @@ h5 {
 /* Mobile Top Nav */
 [data-topnav] {
     display: none;
-    /* Hidden on desktop */
     align-items: center;
     justify-content: space-between;
     padding: 16px 24px;
@@ -146,6 +189,12 @@ h5 {
     top: 0;
     z-index: 50;
     box-shadow: var(--shadow-md);
+}
+
+[data-topnav] span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 [data-topnav] button {
@@ -171,6 +220,18 @@ h5 {
     z-index: 40;
 }
 
+/* Scrollbar styling for sidebar */
+[data-sidebar]::-webkit-scrollbar {
+    width: 4px;
+}
+[data-sidebar]::-webkit-scrollbar-track {
+    background: transparent;
+}
+[data-sidebar]::-webkit-scrollbar-thumb {
+    background: var(--sidebar-border);
+    border-radius: 4px;
+}
+
 @media (max-width: 900px) {
     [data-sidebar-layout] {
         flex-direction: column;
@@ -183,14 +244,13 @@ h5 {
     [data-sidebar] {
         position: fixed;
         left: -270px;
-        /* Hide offscreen */
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         height: 100%;
     }
 
-    /* When toggled open */
     [data-sidebar].open {
         left: 0;
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.3) !important;
     }
 
     .main-content {
@@ -211,6 +271,27 @@ h5 {
 
     .card>header {
         padding: 16px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .page-header-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 500px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -255,6 +336,7 @@ h5 {
     display: flex;
     align-items: center;
     gap: 10px;
+    text-decoration: none;
 }
 
 [data-sidebar] a:hover,
@@ -301,6 +383,10 @@ h5 {
     display: flex;
     align-items: center;
     gap: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
 }
 
 .sidebar-actions {
@@ -319,6 +405,7 @@ h5 {
     font-size: 1.1rem;
     cursor: pointer;
     transition: all 0.2s;
+    margin: 0 !important;
 }
 
 .sidebar-actions button:hover,
@@ -333,6 +420,8 @@ h5 {
 
 main {
     padding: 0 !important;
+    flex: 1;
+    min-width: 0;
 }
 
 .main-content {
@@ -370,11 +459,26 @@ details.card>summary {
     color: var(--text-main);
     background: var(--bg-surface);
     list-style: none;
-    /* Hide arrow in modern browsers */
     display: flex;
     align-items: center;
     gap: 8px;
     transition: background 0.2s;
+    cursor: pointer;
+}
+
+details.card>summary::-webkit-details-marker {
+    display: none;
+}
+
+details.card>summary::after {
+    content: '▸';
+    margin-left: auto;
+    transition: transform 0.2s;
+    color: var(--text-muted);
+}
+
+details.card[open]>summary::after {
+    transform: rotate(90deg);
 }
 
 details.card>summary:hover {
@@ -389,12 +493,22 @@ details.card>summary:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .card>header h3 {
     margin: 0;
     font-size: 1.05rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card>header p {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
 }
 
 /* Card Body padding */
@@ -433,6 +547,12 @@ table {
     color: var(--accent);
 }
 
+.page-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 /* ==========================================================
    Buttons (Deep interactions)
    ========================================================== */
@@ -454,6 +574,8 @@ a[role="button"] {
     align-items: center;
     justify-content: center;
     gap: 6px;
+    line-height: 1.4;
+    white-space: nowrap;
 }
 
 button:hover,
@@ -475,7 +597,6 @@ form button[type="submit"],
     background: var(--accent);
     color: var(--accent-fg);
     border: 1px solid var(--accent-hover);
-    /* Internal lighting effect for 3D depth */
     box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
@@ -483,6 +604,51 @@ form button[type="submit"]:hover,
 .page-header-actions a[role="button"]:first-child:hover {
     background: var(--accent-hover);
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+/* Outline buttons */
+.outline,
+button.outline,
+a.outline[role="button"] {
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    box-shadow: none;
+}
+
+.outline:hover {
+    background: var(--bg-surface-hover);
+    border-color: #cbd5e1;
+}
+
+/* Ghost buttons */
+.ghost,
+button.ghost {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--text-muted);
+    padding: 6px 8px;
+}
+
+.ghost:hover {
+    color: var(--text-main) !important;
+    background: var(--bg-surface-hover) !important;
+}
+
+/* Small buttons */
+.small {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+}
+
+/* Danger variant */
+[data-variant="danger"] {
+    color: var(--danger-text) !important;
+}
+
+[data-variant="danger"]:hover {
+    background: var(--danger-bg) !important;
 }
 
 /* ==========================================================
@@ -493,6 +659,8 @@ input[type="text"],
 input[type="password"],
 input[type="email"],
 input[type="date"],
+input[type="number"],
+input[type="search"],
 select,
 textarea {
     width: 100%;
@@ -515,6 +683,23 @@ textarea:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+}
+
+/* File inputs */
+input[type="file"] {
+    padding: 8px;
+    border: 2px dashed var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface-hover);
+    cursor: pointer;
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: border-color 0.2s;
+}
+
+input[type="file"]:hover {
+    border-color: var(--accent);
 }
 
 /* Toggle Switch Styling */
@@ -589,6 +774,17 @@ label[data-field] {
     letter-spacing: 0.04em;
 }
 
+/* Field hints */
+small[data-hint] {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
 /* Inline Add */
 .inline-add-wrap {
     display: flex;
@@ -626,6 +822,21 @@ form>.form-actions {
     border: 1px solid var(--border-subtle);
 }
 
+/* Validation errors */
+.field-validation-error {
+    display: block;
+    color: var(--danger-text);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 4px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.validation-summary-errors ul {
+    color: var(--danger-text);
+}
+
 /* ==========================================================
    Dashboard Stats (Reimagined)
    ========================================================== */
@@ -638,7 +849,7 @@ form>.form-actions {
 }
 
 .stat-card {
-    padding: 16px 20px;
+    padding: 20px 24px;
     border-radius: var(--radius-lg);
     background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
@@ -648,6 +859,12 @@ form>.form-actions {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .stat-card::after {
@@ -693,7 +910,7 @@ form>.form-actions {
 }
 
 /* ==========================================================
-   Tables & Data Display (Responsive wrapper added)
+   Tables & Data Display
    ========================================================== */
 .table-responsive {
     width: 100%;
@@ -742,6 +959,37 @@ tbody tr:last-child td {
     border-bottom: none;
 }
 
+/* Table action cell */
+.table-actions {
+    white-space: nowrap;
+    text-align: right;
+}
+
+.table-actions a,
+.table-actions button,
+.table-actions form {
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+/* Sort links */
+.sort-link {
+    color: var(--text-muted) !important;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: inherit;
+    font-weight: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    white-space: nowrap;
+}
+
+.sort-link:hover {
+    color: var(--text-main) !important;
+}
+
 /* Status Badges */
 .badge {
     padding: 4px 10px;
@@ -753,9 +1001,10 @@ tbody tr:last-child td {
     align-items: center;
     text-transform: uppercase;
     border: 1px solid transparent;
+    white-space: nowrap;
 }
 
-/* Semantic colors */
+/* Default badge */
 .badge {
     background: var(--bg-app);
     color: var(--text-muted);
@@ -781,10 +1030,32 @@ tbody tr:last-child td {
     border-color: rgba(37, 99, 235, 0.2);
 }
 
+.badge.disposed {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border-color: rgba(220, 38, 38, 0.2);
+}
+
+.badge.transferred {
+    background: #f5f3ff;
+    color: #7c3aed;
+    border-color: rgba(124, 58, 237, 0.2);
+}
+
+[data-theme="dark"] .badge.transferred {
+    background: rgba(124, 58, 237, 0.15);
+}
+
 .badge.danger {
     background: var(--danger-bg);
     color: var(--danger-text);
     border-color: rgba(220, 38, 38, 0.2);
+}
+
+.badge.secondary {
+    background: var(--info-bg);
+    color: var(--info-text);
+    border-color: rgba(37, 99, 235, 0.15);
 }
 
 /* Detail Grid (View Record) */
@@ -818,8 +1089,24 @@ tbody tr:last-child td {
     color: var(--text-main);
 }
 
+/* Photo preview thumbnail */
+.preview-thumb {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border-subtle);
+    object-fit: cover;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.preview-thumb:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
 /* ==========================================================
-   Alerts & Utilities
+   Alerts & Animations
    ========================================================== */
 
 [role="alert"] {
@@ -861,14 +1148,35 @@ tbody tr:last-child td {
     }
 }
 
-/* Login Page Ultra Premium */
+/* Fade out animation for auto-dismiss */
+.fade-out {
+    animation: fadeOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* ==========================================================
+   Login Page Ultra Premium
+   ========================================================== */
 .login-page {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: var(--sidebar-bg);
-    background-image: radial-gradient(circle at top right, rgba(79, 70, 229, 0.15), transparent 400px);
+    background-image:
+        radial-gradient(circle at top right, rgba(79, 70, 229, 0.15), transparent 400px),
+        radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.1), transparent 400px);
 }
 
 .login-card {
@@ -879,6 +1187,18 @@ tbody tr:last-child td {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-elevation);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .login-card header h2 {
@@ -887,7 +1207,9 @@ tbody tr:last-child td {
     font-size: 1.8rem;
 }
 
-/* Pagination */
+/* ==========================================================
+   Pagination
+   ========================================================== */
 .pagination {
     display: flex;
     gap: 4px;
@@ -895,6 +1217,7 @@ tbody tr:last-child td {
     padding: 16px;
     background: var(--bg-surface);
     border-top: 1px solid var(--border-subtle);
+    flex-wrap: wrap;
 }
 
 .pagination a,
@@ -911,6 +1234,7 @@ tbody tr:last-child td {
     color: var(--text-main);
     text-decoration: none;
     transition: all 0.2s;
+    font-size: 0.85rem;
 }
 
 .pagination a:hover {
@@ -919,7 +1243,92 @@ tbody tr:last-child td {
 }
 
 .pagination span.active {
-    background: var(--text-main);
-    color: var(--bg-surface);
-    border-color: var(--text-main);
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-color: var(--accent);
+}
+
+/* ==========================================================
+   Print Styles
+   ========================================================== */
+.print-report {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.print-report header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #333;
+}
+
+.print-report header h2 {
+    margin: 0 0 4px;
+}
+
+.print-report footer {
+    margin-top: 24px;
+    padding-top: 12px;
+    border-top: 1px solid #ccc;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        background-image: none !important;
+    }
+}
+
+/* ==========================================================
+   Ordered/Unordered List Styling (for AD Groups help text)
+   ========================================================== */
+.card ol,
+.card ul {
+    padding: 16px 20px 16px 40px;
+    margin: 0;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+.card ol li,
+.card ul li {
+    padding: 2px 0;
+}
+
+/* ==========================================================
+   Loading State (for future use)
+   ========================================================== */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 3px solid var(--border-subtle);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }

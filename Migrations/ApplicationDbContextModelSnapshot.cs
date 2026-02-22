@@ -198,7 +198,7 @@ namespace LostAndFoundApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasDefaultValueSql("now() at time zone 'utc'");
 
                     b.Property<DateTime>("DateFound")
                         .HasColumnType("timestamp with time zone");

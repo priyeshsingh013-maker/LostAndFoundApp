@@ -117,7 +117,7 @@
                 @if (!string.IsNullOrEmpty(Model.ExistingPhotoPath))
                 {
                     <div class="mb-2">
-                        <img src="@Url.Action("DownloadPhoto", "LostFoundItem", new { id = Model.TrackingId })" alt="Current photo" class="preview-thumb" />
+                        <img src="@Url.Action("Photo", "LostFoundItem", new { id = Model.ExistingPhotoPath })" alt="Current photo" class="preview-thumb" />
                     </div>
                 }
                 <input asp-for="PhotoFile" type="file" accept=".jpg,.jpeg,.png,.gif" />
@@ -128,7 +128,7 @@
                 @if (!string.IsNullOrEmpty(Model.ExistingAttachmentPath))
                 {
                     <div class="mb-2">
-                        <a href="@Url.Action("DownloadAttachment", "LostFoundItem", new { id = Model.TrackingId })"><i class="bi bi-paperclip"></i> Current attachment</a>
+                        <a href="@Url.Action("Attachment", "LostFoundItem", new { id = Model.ExistingAttachmentPath })"><i class="bi bi-paperclip"></i> Current attachment</a>
                     </div>
                 }
                 <input asp-for="AttachmentFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png" />

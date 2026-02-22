@@ -324,27 +324,41 @@ namespace LostAndFoundApp.Controllers
             if (vm.CurrentPage < 1) vm.CurrentPage = 1;
             if (vm.CurrentPage > vm.TotalPages && vm.TotalPages > 0) vm.CurrentPage = vm.TotalPages;
 
-            var results = await query
+            var rawResults = await query
                 .Skip((vm.CurrentPage - 1) * vm.PageSize)
                 .Take(vm.PageSize)
-                .Select(x => new SearchResultItem
+                .Select(x => new
                 {
-                    TrackingId = x.TrackingId,
-                    DateFound = x.DateFound,
+                    x.TrackingId,
+                    x.DateFound,
                     ItemName = x.Item != null ? x.Item.Name : "",
-                    Description = x.Description,
-                    LocationFound = x.LocationFound,
+                    x.Description,
+                    x.LocationFound,
                     RouteName = x.Route != null ? x.Route.Name : "",
                     VehicleName = x.Vehicle != null ? x.Vehicle.Name : "",
                     StorageLocationName = x.StorageLocation != null ? x.StorageLocation.Name : "",
                     StatusName = x.Status != null ? x.Status.Name : "",
-                    DaysSinceFound = (DateTime.Today - x.DateFound.Date).Days,
                     FoundByName = x.FoundBy != null ? x.FoundBy.Name : "",
-                    ClaimedBy = x.ClaimedBy
+                    x.ClaimedBy
                 })
                 .ToListAsync();
 
-            vm.Results = results;
+            vm.Results = rawResults.Select(x => new SearchResultItem
+            {
+                TrackingId = x.TrackingId,
+                DateFound = x.DateFound,
+                ItemName = x.ItemName,
+                Description = x.Description,
+                LocationFound = x.LocationFound,
+                RouteName = x.RouteName,
+                VehicleName = x.VehicleName,
+                StorageLocationName = x.StorageLocationName,
+                StatusName = x.StatusName,
+                DaysSinceFound = (DateTime.Today - x.DateFound.Date).Days,
+                FoundByName = x.FoundByName,
+                ClaimedBy = x.ClaimedBy
+            }).ToList();
+
             return View(vm);
         }
 
@@ -418,24 +432,39 @@ namespace LostAndFoundApp.Controllers
             // Calculate dates using a standard mapped value (EF Core will compute 'Days' safely after pull or map it)
             // SQL Server / SQLite can struggle mapping DateTime.Today natively over EF depending on translation, 
             // but we fetch what we need and materialize cleanly.
-            var results = await query
+            var rawResults = await query
                 .OrderByDescending(x => x.TrackingId)
-                .Select(x => new SearchResultItem
+                .Select(x => new
                 {
-                    TrackingId = x.TrackingId,
-                    DateFound = x.DateFound,
+                    x.TrackingId,
+                    x.DateFound,
                     ItemName = x.Item != null ? x.Item.Name : "",
-                    Description = x.Description,
-                    LocationFound = x.LocationFound,
+                    x.Description,
+                    x.LocationFound,
                     RouteName = x.Route != null ? x.Route.Name : "",
                     VehicleName = x.Vehicle != null ? x.Vehicle.Name : "",
                     StorageLocationName = x.StorageLocation != null ? x.StorageLocation.Name : "",
                     StatusName = x.Status != null ? x.Status.Name : "",
-                    DaysSinceFound = (DateTime.Today - x.DateFound.Date).Days,
                     FoundByName = x.FoundBy != null ? x.FoundBy.Name : "",
-                    ClaimedBy = x.ClaimedBy
+                    x.ClaimedBy
                 })
                 .ToListAsync();
+
+            var results = rawResults.Select(x => new SearchResultItem
+            {
+                TrackingId = x.TrackingId,
+                DateFound = x.DateFound,
+                ItemName = x.ItemName,
+                Description = x.Description,
+                LocationFound = x.LocationFound,
+                RouteName = x.RouteName,
+                VehicleName = x.VehicleName,
+                StorageLocationName = x.StorageLocationName,
+                StatusName = x.StatusName,
+                DaysSinceFound = (DateTime.Today - x.DateFound.Date).Days,
+                FoundByName = x.FoundByName,
+                ClaimedBy = x.ClaimedBy
+            }).ToList();
 
             vm.Results = results;
             vm.TotalRecords = results.Count;

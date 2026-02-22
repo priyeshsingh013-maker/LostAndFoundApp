@@ -279,7 +279,7 @@ namespace LostAndFoundApp.Migrations
                     FoundById = table.Column<int>(type: "integer", nullable: true),
                     ClaimedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     CreatedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    CreatedDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now() at time zone 'utc'"),
                     Notes = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     AttachmentPath = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
                 },

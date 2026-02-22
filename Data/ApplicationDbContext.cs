@@ -70,7 +70,7 @@ namespace LostAndFoundApp.Data
 
                 entity.Property(e => e.DateFound).IsRequired();
                 entity.Property(e => e.LocationFound).IsRequired().HasMaxLength(300);
-                entity.Property(e => e.CreatedDateTime).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedDateTime).HasDefaultValueSql("now() at time zone 'utc'");
 
                 // Index on DateFound for efficient range queries in search
                 entity.HasIndex(e => e.DateFound);

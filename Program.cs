@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using LostAndFoundApp.Data;
 using LostAndFoundApp.Models;
@@ -61,8 +62,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = true;
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensure secure cookie transmission
-    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
 // --- Authorization policies for role-based access control ---
@@ -76,6 +79,12 @@ builder.Services.AddAuthorization(options =>
 // --- Application services ---
 builder.Services.AddScoped<FileService>();
 builder.Services.AddScoped<AdSyncService>();
+
+// --- Configure antiforgery to accept token from AJAX header ---
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
+});
 
 // --- MVC ---
 builder.Services.AddControllersWithViews();
@@ -107,8 +116,17 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios.
     app.UseHsts();
 }
+// --- Forwarded headers for reverse proxy (Render.com) ---
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseStaticFiles();
 app.UseRouting();
 

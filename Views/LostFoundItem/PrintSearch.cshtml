@@ -9,23 +9,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lost &amp; Found — Print Report</title>
     <link rel="stylesheet" href="https://unpkg.com/@@knadh/oat/oat.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css">
     <style>
         @@media print { .no-print { display: none !important; } }
+        body { background-image: none !important; background-color: white !important; }
     </style>
 </head>
 <body>
     <div class="print-report">
         <header>
             <h2>Lost &amp; Found Item Report</h2>
-            <p class="text-light">Generated @DateTime.Now.ToString("MMMM dd, yyyy hh:mm tt")</p>
+            <p style="color: #64748b; font-size: 0.9rem;">Generated @DateTime.Now.ToString("MMMM dd, yyyy hh:mm tt")</p>
         </header>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: var(--space-3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">
             <span>@Model.FilterSummary</span>
             <span><strong>@Model.Results.Count</strong> record(s)</span>
         </div>
 
-        <button class="outline small no-print" onclick="window.print()"><i>🖨</i> Print</button>
+        <button class="outline small no-print" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
 
         <table>
             <thead>

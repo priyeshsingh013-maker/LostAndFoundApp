@@ -1,4 +1,4 @@
-# Dockerfile encoding fix
+# Dockerfile — Bust cache for migration fix
 # Stage 1: Build & Publish
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
@@ -11,7 +11,7 @@ RUN dotnet publish "LostAndFoundApp.csproj" -c Release -o /app/publish /p:UseApp
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-# Establish the external bind port logic for Render.com dynamic PORTs
+# Render.com dynamic PORT binding
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "LostAndFoundApp.dll"]

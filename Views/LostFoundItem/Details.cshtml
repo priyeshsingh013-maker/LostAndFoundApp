@@ -92,13 +92,13 @@
         <div class="hstack">
             @if (!string.IsNullOrEmpty(Model.PhotoPath))
             {
-                <a href="@Url.Action("DownloadPhoto", "LostFoundItem", new { id = Model.TrackingId })">
-                    <img src="@Url.Action("DownloadPhoto", "LostFoundItem", new { id = Model.TrackingId })" alt="Photo" class="preview-thumb" />
+                <a href="@Url.Action("Photo", "LostFoundItem", new { id = Model.PhotoPath })">
+                    <img src="@Url.Action("Photo", "LostFoundItem", new { id = Model.PhotoPath })" alt="Photo" class="preview-thumb" />
                 </a>
             }
             @if (!string.IsNullOrEmpty(Model.AttachmentPath))
             {
-                <a href="@Url.Action("DownloadAttachment", "LostFoundItem", new { id = Model.TrackingId })" role="button" class="outline">
+                <a href="@Url.Action("Attachment", "LostFoundItem", new { id = Model.AttachmentPath })" role="button" class="outline">
                     <i class="bi bi-paperclip"></i> Download Attachment
                 </a>
             }
