@@ -133,6 +133,8 @@ namespace LostAndFoundApp.Controllers
                 ClaimedBy = item.ClaimedBy,
                 CreatedBy = item.CreatedBy,
                 CreatedDateTime = item.CreatedDateTime,
+                ModifiedBy = item.ModifiedBy,
+                ModifiedDateTime = item.ModifiedDateTime,
                 Notes = item.Notes,
                 AttachmentPath = item.AttachmentPath
             };
@@ -200,6 +202,9 @@ namespace LostAndFoundApp.Controllers
             item.FoundById = vm.FoundById;
             item.ClaimedBy = vm.ClaimedBy;
             item.Notes = vm.Notes;
+            // Audit trail — auto-populated, never user-editable
+            item.ModifiedBy = User.Identity?.Name ?? "Unknown";
+            item.ModifiedDateTime = DateTime.UtcNow;
             // CreatedBy and CreatedDateTime are never modified
 
             // Handle photo replacement

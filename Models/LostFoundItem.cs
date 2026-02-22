@@ -95,6 +95,19 @@ namespace LostAndFoundApp.Models
         [Display(Name = "Created Date/Time")]
         public DateTime CreatedDateTime { get; set; }
 
+        /// <summary>
+        /// Username of the user who last modified the record — auto-populated on edit, never user-editable.
+        /// </summary>
+        [StringLength(256)]
+        [Display(Name = "Modified By")]
+        public string? ModifiedBy { get; set; }
+
+        /// <summary>
+        /// Timestamp of last modification — auto-populated server-side UTC on edit, never user-editable.
+        /// </summary>
+        [Display(Name = "Modified Date/Time")]
+        public DateTime? ModifiedDateTime { get; set; }
+
         [StringLength(1000)]
         [Display(Name = "Notes")]
         public string? Notes { get; set; }

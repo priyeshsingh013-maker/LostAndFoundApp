@@ -478,6 +478,89 @@ namespace LostAndFoundApp.Controllers
         }
 
         // =====================================================================
+        // TOGGLE ACTIVE (SOFT DEACTIVATION) FOR ALL MASTER DATA
+        // Enterprise pattern: deactivate instead of hard-delete for referential safety
+        // =====================================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "RequireSupervisorOrAbove")]
+        public async Task<IActionResult> ToggleItemActive(int id)
+        {
+            var item = await _context.Items.FindAsync(id);
+            if (item == null) return NotFound();
+            item.IsActive = !item.IsActive;
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Item '{item.Name}' has been {(item.IsActive ? "activated" : "deactivated")}.";
+            return RedirectToAction(nameof(Items));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "RequireSupervisorOrAbove")]
+        public async Task<IActionResult> ToggleRouteActive(int id)
+        {
+            var route = await _context.Routes.FindAsync(id);
+            if (route == null) return NotFound();
+            route.IsActive = !route.IsActive;
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Route '{route.Name}' has been {(route.IsActive ? "activated" : "deactivated")}.";
+            return RedirectToAction(nameof(Routes));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "RequireSupervisorOrAbove")]
+        public async Task<IActionResult> ToggleVehicleActive(int id)
+        {
+            var vehicle = await _context.Vehicles.FindAsync(id);
+            if (vehicle == null) return NotFound();
+            vehicle.IsActive = !vehicle.IsActive;
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Vehicle '{vehicle.Name}' has been {(vehicle.IsActive ? "activated" : "deactivated")}.";
+            return RedirectToAction(nameof(Vehicles));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "RequireSupervisorOrAbove")]
+        public async Task<IActionResult> ToggleStorageLocationActive(int id)
+        {
+            var location = await _context.StorageLocations.FindAsync(id);
+            if (location == null) return NotFound();
+            location.IsActive = !location.IsActive;
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Storage Location '{location.Name}' has been {(location.IsActive ? "activated" : "deactivated")}.";
+            return RedirectToAction(nameof(StorageLocations));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "RequireSupervisorOrAbove")]
+        public async Task<IActionResult> ToggleStatusActive(int id)
+        {
+            var status = await _context.Statuses.FindAsync(id);
+            if (status == null) return NotFound();
+            status.IsActive = !status.IsActive;
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Status '{status.Name}' has been {(status.IsActive ? "activated" : "deactivated")}.";
+            return RedirectToAction(nameof(Statuses));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "RequireSupervisorOrAbove")]
+        public async Task<IActionResult> ToggleFoundByNameActive(int id)
+        {
+            var name = await _context.FoundByNames.FindAsync(id);
+            if (name == null) return NotFound();
+            name.IsActive = !name.IsActive;
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Found By Name '{name.Name}' has been {(name.IsActive ? "activated" : "deactivated")}.";
+            return RedirectToAction(nameof(FoundByNames));
+        }
+
+        // =====================================================================
         // AJAX ENDPOINTS FOR INLINE DROPDOWN CREATION
         // All authenticated users can create new values inline from the item form
         // =====================================================================
@@ -587,3 +670,4 @@ namespace LostAndFoundApp.Controllers
         public string Name { get; set; } = string.Empty;
     }
 }
+

@@ -30,6 +30,12 @@
                         <td><span class="badge @(item.IsActive ? "success" : "danger")">@(item.IsActive ? "Active" : "Inactive")</span></td>
                         <td class="table-actions">
                             <a href="@Url.Action("EditFoundByName", "MasterData", new { id = item.Id })" role="button" class="ghost small" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+                            <form asp-controller="MasterData" asp-action="ToggleFoundByNameActive" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="ghost small" title="@(item.IsActive ? "Deactivate" : "Activate")" aria-label="@(item.IsActive ? "Deactivate" : "Activate")">
+                                    <i class="bi @(item.IsActive ? "bi-toggle-on" : "bi-toggle-off")" style="color: @(item.IsActive ? "var(--success-text)" : "var(--danger-text)");"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 }

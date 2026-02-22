@@ -117,5 +117,16 @@
             <span class="detail-label">Created On</span>
             <span class="detail-value">@Model.CreatedDateTime.ToString("MMMM dd, yyyy hh:mm tt")</span>
         </div>
+        @if (!string.IsNullOrEmpty(Model.ModifiedBy))
+        {
+            <div class="detail-item">
+                <span class="detail-label">Last Modified By</span>
+                <span class="detail-value">@Model.ModifiedBy</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Last Modified On</span>
+                <span class="detail-value">@Model.ModifiedDateTime?.ToString("MMMM dd, yyyy hh:mm tt")</span>
+            </div>
+        }
     </div>
 </article>
