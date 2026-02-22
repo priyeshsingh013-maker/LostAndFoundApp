@@ -5,7 +5,8 @@ using LostAndFoundApp.Models;
 namespace LostAndFoundApp.Data
 {
     /// <summary>
-    /// Seeds the database with roles, default super admin account, and default master data on first run.
+    /// Seeds the database with roles, default accounts for all three roles,
+    /// and default master data on first run.
     /// </summary>
     public static class DbInitializer
     {
@@ -16,9 +17,7 @@ namespace LostAndFoundApp.Data
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Migrations are now handled globally in Program.cs
-
-            // Seed roles
+            // ─── Seed Roles ────────────────────────────────────────
             string[] roles = { "SuperAdmin", "Supervisor", "User" };
             foreach (var role in roles)
             {
@@ -28,33 +27,41 @@ namespace LostAndFoundApp.Data
                 }
             }
 
-            // Seed default Super Admin account
-            const string adminUserName = "sadmin";
-            const string adminPassword = "Rider@2025";
-            const string adminEmail = "sadmin@lostandfound.local";
-
-            var existingAdmin = await userManager.FindByNameAsync(adminUserName);
-            if (existingAdmin == null)
+            // ─── Seed Default Accounts ─────────────────────────────
+            // Account 1: Super Admin — full system control
+            await SeedUserAsync(userManager, new SeedAccount
             {
-                var adminUser = new ApplicationUser
-                {
-                    UserName = adminUserName,
-                    Email = adminEmail,
-                    EmailConfirmed = true,
-                    DisplayName = "System Administrator",
-                    IsAdUser = false,
-                    MustChangePassword = true, // Must change password on first login
-                    IsActive = true
-                };
+                UserName = "sadmin",
+                Email = "sadmin@lostandfound.local",
+                DisplayName = "System Administrator",
+                Password = "Rider@2025",
+                Role = "SuperAdmin",
+                MustChangePassword = true
+            });
 
-                var result = await userManager.CreateAsync(adminUser, adminPassword);
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
-                }
-            }
+            // Account 2: Supervisor — operational management
+            await SeedUserAsync(userManager, new SeedAccount
+            {
+                UserName = "supervisor",
+                Email = "supervisor@lostandfound.local",
+                DisplayName = "Shift Supervisor",
+                Password = "Rider@2025",
+                Role = "Supervisor",
+                MustChangePassword = true
+            });
 
-            // Seed default Status values
+            // Account 3: User — standard data entry operator
+            await SeedUserAsync(userManager, new SeedAccount
+            {
+                UserName = "user",
+                Email = "user@lostandfound.local",
+                DisplayName = "Staff User",
+                Password = "Rider@2025",
+                Role = "User",
+                MustChangePassword = true
+            });
+
+            // ─── Seed Default Status Values ────────────────────────
             if (!await context.Statuses.AnyAsync())
             {
                 context.Statuses.AddRange(
@@ -67,7 +74,7 @@ namespace LostAndFoundApp.Data
                 await context.SaveChangesAsync();
             }
 
-            // Seed default Item types
+            // ─── Seed Default Item Types ───────────────────────────
             if (!await context.Items.AnyAsync())
             {
                 context.Items.AddRange(
@@ -85,7 +92,7 @@ namespace LostAndFoundApp.Data
                 await context.SaveChangesAsync();
             }
 
-            // Seed default Storage Locations
+            // ─── Seed Default Storage Locations ────────────────────
             if (!await context.StorageLocations.AnyAsync())
             {
                 context.StorageLocations.AddRange(
@@ -96,6 +103,43 @@ namespace LostAndFoundApp.Data
                 );
                 await context.SaveChangesAsync();
             }
+        }
+
+        /// <summary>
+        /// Creates a user account if it does not already exist, then assigns the specified role.
+        /// </summary>
+        private static async Task SeedUserAsync(UserManager<ApplicationUser> userManager, SeedAccount account)
+        {
+            var existing = await userManager.FindByNameAsync(account.UserName);
+            if (existing != null) return;
+
+            var user = new ApplicationUser
+            {
+                UserName = account.UserName,
+                Email = account.Email,
+                EmailConfirmed = true,
+                DisplayName = account.DisplayName,
+                IsAdUser = false,
+                MustChangePassword = account.MustChangePassword,
+                IsActive = true
+            };
+
+            var result = await userManager.CreateAsync(user, account.Password);
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, account.Role);
+            }
+        }
+
+        /// <summary>Helper class for seeding user accounts.</summary>
+        private class SeedAccount
+        {
+            public string UserName { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string DisplayName { get; set; } = string.Empty;
+            public string Password { get; set; } = string.Empty;
+            public string Role { get; set; } = string.Empty;
+            public bool MustChangePassword { get; set; }
         }
     }
 }

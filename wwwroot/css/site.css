@@ -127,30 +127,86 @@ h5 {
    Utility Classes
    ========================================================== */
 
-.text-center { text-align: center; }
-.text-light { color: var(--text-muted); }
-.text-lighter { color: var(--text-muted); opacity: 0.7; }
-.text-danger { color: var(--danger-text); }
-.text-success { color: var(--success-text); }
+.text-center {
+    text-align: center;
+}
 
-.mb-1 { margin-bottom: var(--space-1); }
-.mb-2 { margin-bottom: var(--space-2); }
-.mb-3 { margin-bottom: var(--space-3); }
-.mb-4 { margin-bottom: var(--space-4); }
-.mb-5 { margin-bottom: var(--space-5); }
+.text-light {
+    color: var(--text-muted);
+}
 
-.mt-1 { margin-top: var(--space-1); }
-.mt-2 { margin-top: var(--space-2); }
-.mt-3 { margin-top: var(--space-3); }
-.mt-4 { margin-top: var(--space-4); }
-.mt-5 { margin-top: var(--space-5); }
+.text-lighter {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
 
-.p-2 { padding: var(--space-2); }
-.p-3 { padding: var(--space-3); }
-.p-4 { padding: var(--space-4); }
-.p-5 { padding: var(--space-5); }
+.text-danger {
+    color: var(--danger-text);
+}
 
-.w-100 { width: 100%; }
+.text-success {
+    color: var(--success-text);
+}
+
+.mb-1 {
+    margin-bottom: var(--space-1);
+}
+
+.mb-2 {
+    margin-bottom: var(--space-2);
+}
+
+.mb-3 {
+    margin-bottom: var(--space-3);
+}
+
+.mb-4 {
+    margin-bottom: var(--space-4);
+}
+
+.mb-5 {
+    margin-bottom: var(--space-5);
+}
+
+.mt-1 {
+    margin-top: var(--space-1);
+}
+
+.mt-2 {
+    margin-top: var(--space-2);
+}
+
+.mt-3 {
+    margin-top: var(--space-3);
+}
+
+.mt-4 {
+    margin-top: var(--space-4);
+}
+
+.mt-5 {
+    margin-top: var(--space-5);
+}
+
+.p-2 {
+    padding: var(--space-2);
+}
+
+.p-3 {
+    padding: var(--space-3);
+}
+
+.p-4 {
+    padding: var(--space-4);
+}
+
+.p-5 {
+    padding: var(--space-5);
+}
+
+.w-100 {
+    width: 100%;
+}
 
 .hstack {
     display: flex;
@@ -224,9 +280,11 @@ h5 {
 [data-sidebar]::-webkit-scrollbar {
     width: 4px;
 }
+
 [data-sidebar]::-webkit-scrollbar-track {
     background: transparent;
 }
+
 [data-sidebar]::-webkit-scrollbar-thumb {
     background: var(--sidebar-border);
     border-radius: 4px;
@@ -1195,6 +1253,7 @@ tbody tr:last-child td {
         opacity: 0;
         transform: translateY(20px) scale(0.98);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -1331,4 +1390,47 @@ tbody tr:last-child td {
     to {
         transform: rotate(360deg);
     }
+}
+
+/* ==========================================================
+   Role Badge Colors
+   ========================================================== */
+
+.badge.superadmin {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border-color: rgba(220, 38, 38, 0.2);
+}
+
+.badge.supervisor {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border-color: rgba(217, 119, 6, 0.2);
+}
+
+.badge.user {
+    background: var(--info-bg);
+    color: var(--info-text);
+    border-color: rgba(37, 99, 235, 0.2);
+}
+
+/* ==========================================================
+   Dashboard Layout Responsive
+   ========================================================== */
+
+@media (max-width: 900px) {
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Hover-lift for quick action cards */
+.card:hover {
+    transform: translateY(-1px);
+}
+
+a:has(.card):hover .card {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
 }
