@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LostAndFoundApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260222172716_PostgreSQLInitialMigration")]
-    partial class PostgreSQLInitialMigration
+    [Migration("20260222174143_InitPostgres")]
+    partial class InitPostgres
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
