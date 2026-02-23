@@ -80,6 +80,7 @@ namespace LostAndFoundApp.ViewModels
         public string ConfirmPassword { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Role is required.")]
+        [RegularExpression("^(SuperAdmin|Supervisor|User)$", ErrorMessage = "Invalid role. Must be SuperAdmin, Supervisor, or User.")]
         [Display(Name = "Role")]
         public string Role { get; set; } = string.Empty;
     }
@@ -92,6 +93,7 @@ namespace LostAndFoundApp.ViewModels
         public string CurrentRole { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Role is required.")]
+        [RegularExpression("^(SuperAdmin|Supervisor|User)$", ErrorMessage = "Invalid role. Must be SuperAdmin, Supervisor, or User.")]
         [Display(Name = "New Role")]
         public string NewRole { get; set; } = string.Empty;
     }

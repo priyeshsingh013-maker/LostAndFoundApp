@@ -62,6 +62,18 @@ namespace LostAndFoundApp.Services
                 return null;
             }
 
+            // Reject files with multiple extensions (e.g., 'malware.exe.jpg') as a security measure
+            var nameWithoutExt = Path.GetFileNameWithoutExtension(file.FileName);
+            if (nameWithoutExt.Contains('.'))
+            {
+                var innerExt = Path.GetExtension(nameWithoutExt).ToLowerInvariant();
+                if (!string.IsNullOrEmpty(innerExt) && !allowedExtensions.Contains(innerExt))
+                {
+                    _logger.LogWarning("File upload rejected: suspicious double extension in '{FileName}'", file.FileName);
+                    return null;
+                }
+            }
+
             // Ensure storage directory exists
             Directory.CreateDirectory(storagePath);
 
@@ -103,7 +115,15 @@ namespace LostAndFoundApp.Services
 
             // Prevent path traversal attacks by ensuring only the file name is used
             var sanitizedFileName = Path.GetFileName(fileName);
-            var filePath = Path.Combine(storagePath, sanitizedFileName);
+            var filePath = Path.GetFullPath(Path.Combine(storagePath, sanitizedFileName));
+
+            // Defense-in-depth: ensure resolved path stays within the storage directory
+            var fullStoragePath = Path.GetFullPath(storagePath);
+            if (!filePath.StartsWith(fullStoragePath, StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogWarning("Path traversal attempt detected: {Path}", fileName);
+                return null;
+            }
 
             if (!File.Exists(filePath))
             {
@@ -140,12 +160,20 @@ namespace LostAndFoundApp.Services
 
         private void DeleteFile(string fileName, string storagePath)
         {
-            var sanitizedFileName = Path.GetFileName(fileName);
-            var filePath = Path.Combine(storagePath, sanitizedFileName);
-            if (File.Exists(filePath))
+            try
             {
-                File.Delete(filePath);
-                _logger.LogInformation("File deleted: {FileName}", sanitizedFileName);
+                var sanitizedFileName = Path.GetFileName(fileName);
+                var filePath = Path.Combine(storagePath, sanitizedFileName);
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                    _logger.LogInformation("File deleted: {FileName}", sanitizedFileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete file '{FileName}'. It may be locked or inaccessible.", fileName);
+                // Don't rethrow — file deletion failure should not crash the parent operation
             }
         }
     }

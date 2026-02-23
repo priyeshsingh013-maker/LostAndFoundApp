@@ -13,8 +13,6 @@
 <form asp-action="Edit" asp-controller="LostFoundItem" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="TrackingId" />
-    <input type="hidden" asp-for="CreatedBy" />
-    <input type="hidden" asp-for="CreatedDateTime" />
     <input type="hidden" asp-for="ExistingPhotoPath" />
     <input type="hidden" asp-for="ExistingAttachmentPath" />
     <div asp-validation-summary="ModelOnly" role="alert" data-variant="error"></div>

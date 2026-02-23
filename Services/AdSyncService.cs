@@ -109,9 +109,11 @@ namespace LostAndFoundApp.Services
                             continue;
                         }
 
-                        var members = group.GetMembers(true);
+                        using var members = group.GetMembers(true);
                         foreach (var member in members)
                         {
+                            using (member) // Dispose each Principal after use
+                            {
                             if (member is UserPrincipal userPrincipal)
                             {
                                 var samAccountName = userPrincipal.SamAccountName;
@@ -175,6 +177,7 @@ namespace LostAndFoundApp.Services
                                         result.UsersUpdated++;
                                     }
                                 }
+                            }
                             }
                         }
                     }

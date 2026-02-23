@@ -1414,17 +1414,7 @@ tbody tr:last-child td {
     border-color: rgba(37, 99, 235, 0.2);
 }
 
-.badge.success {
-    background: var(--success-bg);
-    color: var(--success-text);
-    border-color: rgba(22, 163, 74, 0.2);
-}
 
-.badge.danger {
-    background: var(--danger-bg);
-    color: var(--danger-text);
-    border-color: rgba(220, 38, 38, 0.2);
-}
 
 /* ==========================================================
    Dashboard Layout Responsive
@@ -1445,4 +1435,79 @@ tbody tr:last-child td {
 a:has(.card):hover .card {
     transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
+}
+
+/* ==========================================================
+   Loading / Processing States
+   ========================================================== */
+
+/* Spinning icon for loading buttons */
+.spin-icon {
+    display: inline-block;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Loading button disabled state */
+.loading-btn {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Upload preview container */
+.upload-preview {
+    margin-top: 8px;
+}
+
+.upload-preview img {
+    border: 2px dashed var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 2px;
+}
+
+/* ==========================================================
+   Toast / Notification Enhancements
+   ========================================================== */
+
+/* Ensure toasts stack above other content */
+[role="alert"] {
+    position: relative;
+    z-index: 100;
+}
+
+/* Info variant for loading/progress toasts */
+[role="alert"][data-variant="info"] {
+    border-left-color: var(--info-text);
+}
+
+/* Warning variant for caution messages */
+[role="alert"][data-variant="warning"] {
+    border-left-color: var(--warning-text);
+}
+
+/* Scrollable validation errors when there are many */
+.validation-summary-errors ul {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* ==========================================================
+   Empty State Styling
+   ========================================================== */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    opacity: 0.3;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    margin: 0;
 }

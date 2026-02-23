@@ -19,13 +19,32 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // --- Database ---
-// Detect if Render.com injected the POSTGRES_URL environment variable, otherwise fallback to local connection string.
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
-    ?? builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Production: Use PostgreSQL (Render.com DATABASE_URL or appsettings connection string)
+// Development: Use SQLite for zero-setup local development
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    // Production or explicit PostgreSQL override
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(databaseUrl));
+}
+else if (builder.Environment.IsDevelopment())
+{
+    // Development: SQLite — no PostgreSQL install needed
+    var sqlitePath = Path.Combine(builder.Environment.ContentRootPath, "LostAndFound_Dev.db");
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite($"Data Source={sqlitePath}"));
+    Log.Information("Using SQLite database at: {Path}", sqlitePath);
+}
+else
+{
+    // Production without DATABASE_URL: use configured PostgreSQL connection string
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found and DATABASE_URL not set.");
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(connectionString));
+}
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // --- ASP.NET Core Identity ---
@@ -91,11 +110,28 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// --- Apply Migrations on Startup ---
-using (var scope = app.Services.CreateScope())
+// --- Apply Database Schema on Startup ---
+try
 {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await context.Database.MigrateAsync();
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        if (app.Environment.IsDevelopment() && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL")))
+        {
+            // SQLite in dev: create schema directly from model (no migrations needed)
+            await context.Database.EnsureCreatedAsync();
+        }
+        else
+        {
+            // PostgreSQL in production: run EF Core migrations
+            await context.Database.MigrateAsync();
+        }
+    }
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Database initialization failed. Application cannot start.");
+    throw; // Let it crash — can't run without a database
 }
 
 // --- Seed database on startup ---
@@ -116,13 +152,15 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios.
     app.UseHsts();
 }
+// Handle 404, 403, etc. with a friendly error page instead of blank/browser-default pages
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 // --- Forwarded headers for reverse proxy (Render.com) ---
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }

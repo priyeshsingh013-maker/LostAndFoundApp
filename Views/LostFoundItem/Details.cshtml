@@ -93,7 +93,7 @@
             @if (!string.IsNullOrEmpty(Model.PhotoPath))
             {
                 <a href="@Url.Action("Photo", "LostFoundItem", new { id = Model.PhotoPath })">
-                    <img src="@Url.Action("Photo", "LostFoundItem", new { id = Model.PhotoPath })" alt="Photo" class="preview-thumb" />
+                    <img src="@Url.Action("Photo", "LostFoundItem", new { id = Model.PhotoPath })" alt="Photo" class="preview-thumb" loading="lazy" />
                 </a>
             }
             @if (!string.IsNullOrEmpty(Model.AttachmentPath))

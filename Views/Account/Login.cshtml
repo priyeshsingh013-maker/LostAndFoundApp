@@ -28,10 +28,14 @@
         </label>
 
             <label data-field style="display: flex; align-items: center; gap: 8px; margin: 16px 0 28px 0; font-weight: 500;">
-                <input type="checkbox" asp-for="RememberMe" style="width: auto; margin: 0; box-shadow: none;" /> Remember me for 30 days
+                <input type="checkbox" asp-for="RememberMe" style="width: auto; margin: 0; box-shadow: none;" /> Remember me
             </label>
 
             <button type="submit" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="bi bi-box-arrow-in-right"></i> Sign In</button>
         </form>
     </div>
 </article>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using LostAndFoundApp.Models;
 
 namespace LostAndFoundApp.ViewModels
 {
@@ -8,6 +9,7 @@ namespace LostAndFoundApp.ViewModels
         [Required(ErrorMessage = "Date Found is required.")]
         [DataType(DataType.Date)]
         [Display(Name = "Date Found")]
+        [NotFutureDate(ErrorMessage = "Date Found cannot be in the future.")]
         public DateTime DateFound { get; set; } = DateTime.Today;
 
         [Required(ErrorMessage = "Item type is required.")]

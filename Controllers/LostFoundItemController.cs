@@ -39,6 +39,8 @@ namespace LostAndFoundApp.Controllers
         // POST: /LostFoundItem/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestFormLimits(MultipartBodyLengthLimit = 15_728_640)] // 15MB
+        [RequestSizeLimit(15_728_640)]
         public async Task<IActionResult> Create(LostFoundItemCreateViewModel vm)
         {
             if (!ModelState.IsValid)
@@ -92,7 +94,17 @@ namespace LostAndFoundApp.Controllers
             }
 
             _context.LostFoundItems.Add(item);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to save new LostFoundItem");
+                ModelState.AddModelError(string.Empty, "An error occurred while saving the record. Please try again.");
+                await PopulateDropdowns(vm);
+                return View(vm);
+            }
 
             _logger.LogInformation("LostFoundItem {TrackingId} created by {User}", item.TrackingId, item.CreatedBy);
             TempData["SuccessMessage"] = $"Item record #{item.TrackingId} created successfully.";
@@ -178,6 +190,8 @@ namespace LostAndFoundApp.Controllers
         // POST: /LostFoundItem/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestFormLimits(MultipartBodyLengthLimit = 15_728_640)] // 15MB
+        [RequestSizeLimit(15_728_640)]
         public async Task<IActionResult> Edit(LostFoundItemEditViewModel vm)
         {
             if (!ModelState.IsValid)
@@ -214,6 +228,8 @@ namespace LostAndFoundApp.Controllers
                 if (photoName == null)
                 {
                     ModelState.AddModelError("PhotoFile", "Invalid photo file. Allowed types: jpg, jpeg, png, gif. Max size: 10MB.");
+                    vm.ExistingPhotoPath = item.PhotoPath;
+                    vm.ExistingAttachmentPath = item.AttachmentPath;
                     await PopulateDropdowns(vm);
                     return View(vm);
                 }
@@ -229,6 +245,8 @@ namespace LostAndFoundApp.Controllers
                 if (attachmentName == null)
                 {
                     ModelState.AddModelError("AttachmentFile", "Invalid attachment file.");
+                    vm.ExistingPhotoPath = item.PhotoPath;
+                    vm.ExistingAttachmentPath = item.AttachmentPath;
                     await PopulateDropdowns(vm);
                     return View(vm);
                 }
@@ -237,7 +255,19 @@ namespace LostAndFoundApp.Controllers
             }
 
             _context.LostFoundItems.Update(item);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to update LostFoundItem {TrackingId}", vm.TrackingId);
+                ModelState.AddModelError(string.Empty, "An error occurred while saving changes. Please try again.");
+                vm.ExistingPhotoPath = item.PhotoPath;
+                vm.ExistingAttachmentPath = item.AttachmentPath;
+                await PopulateDropdowns(vm);
+                return View(vm);
+            }
 
             _logger.LogInformation("LostFoundItem {TrackingId} updated by {User}", item.TrackingId, User.Identity?.Name);
             TempData["SuccessMessage"] = $"Item record #{item.TrackingId} updated successfully.";
@@ -317,8 +347,8 @@ namespace LostAndFoundApp.Controllers
             query = vm.SortField switch
             {
                 "DateFound" => vm.SortOrder == "asc" ? query.OrderBy(x => x.DateFound) : query.OrderByDescending(x => x.DateFound),
-                "ItemName" => vm.SortOrder == "asc" ? query.OrderBy(x => x.Item!.Name) : query.OrderByDescending(x => x.Item!.Name),
-                "StatusName" => vm.SortOrder == "asc" ? query.OrderBy(x => x.Status!.Name) : query.OrderByDescending(x => x.Status!.Name),
+                "ItemName" => vm.SortOrder == "asc" ? query.OrderBy(x => x.Item != null ? x.Item.Name : "") : query.OrderByDescending(x => x.Item != null ? x.Item.Name : ""),
+                "StatusName" => vm.SortOrder == "asc" ? query.OrderBy(x => x.Status != null ? x.Status.Name : "") : query.OrderByDescending(x => x.Status != null ? x.Status.Name : ""),
                 "LocationFound" => vm.SortOrder == "asc" ? query.OrderBy(x => x.LocationFound) : query.OrderByDescending(x => x.LocationFound),
                 _ => vm.SortOrder == "asc" ? query.OrderBy(x => x.TrackingId) : query.OrderByDescending(x => x.TrackingId),
             };
@@ -483,11 +513,24 @@ namespace LostAndFoundApp.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 
-            var result = _fileService.GetPhoto(id);
-            if (result == null || result.Value.Stream == null)
-                return NotFound();
+            try
+            {
+                var result = _fileService.GetPhoto(id);
+                if (result == null || result.Value.Stream == null)
+                {
+                    // Return a 1x1 transparent PNG so <img> tags don't show broken icons
+                    // This prevents UseStatusCodePagesWithReExecute from turning 404 into HTML
+                    var placeholder = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==");
+                    return File(placeholder, "image/png");
+                }
 
-            return File(result.Value.Stream, result.Value.ContentType);
+                return File(result.Value.Stream, result.Value.ContentType);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error serving photo '{FileName}'", id);
+                return StatusCode(500);
+            }
         }
 
         // GET: /LostFoundItem/Attachment/{fileName} — authenticated file streaming
@@ -497,18 +540,33 @@ namespace LostAndFoundApp.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 
-            var result = _fileService.GetAttachment(id);
-            if (result == null || result.Value.Stream == null)
-                return NotFound();
+            try
+            {
+                var result = _fileService.GetAttachment(id);
+                if (result == null || result.Value.Stream == null)
+                {
+                    TempData["ErrorMessage"] = "The requested attachment was not found. It may have been deleted.";
+                    return RedirectToAction(nameof(Search));
+                }
 
-            var fileName = Path.GetFileName(id);
-            return File(result.Value.Stream, result.Value.ContentType, fileName);
+                var fileName = Path.GetFileName(id);
+                return File(result.Value.Stream, result.Value.ContentType, fileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error serving attachment '{FileName}'", id);
+                TempData["ErrorMessage"] = "Could not retrieve the attachment. Please try again.";
+                return RedirectToAction(nameof(Search));
+            }
         }
 
         // =====================================================================
         // HELPER METHODS
         // =====================================================================
 
+        /// <summary>
+        /// Populate dropdowns for Create — only active master data items.
+        /// </summary>
         private async Task PopulateDropdowns(LostFoundItemCreateViewModel vm)
         {
             vm.Items = new SelectList(await _context.Items.Where(x => x.IsActive).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.ItemId);
@@ -517,6 +575,20 @@ namespace LostAndFoundApp.Controllers
             vm.StorageLocations = new SelectList(await _context.StorageLocations.Where(x => x.IsActive).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.StorageLocationId);
             vm.Statuses = new SelectList(await _context.Statuses.Where(x => x.IsActive).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.StatusId);
             vm.FoundByNames = new SelectList(await _context.FoundByNames.Where(x => x.IsActive).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.FoundById);
+        }
+
+        /// <summary>
+        /// Populate dropdowns for Edit — active items PLUS the currently-selected value
+        /// even if it has been deactivated, so the dropdown retains the existing selection.
+        /// </summary>
+        private async Task PopulateDropdowns(LostFoundItemEditViewModel vm)
+        {
+            vm.Items = new SelectList(await _context.Items.Where(x => x.IsActive || x.Id == vm.ItemId).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.ItemId);
+            vm.Routes = new SelectList(await _context.Routes.Where(x => x.IsActive || x.Id == vm.RouteId).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.RouteId);
+            vm.Vehicles = new SelectList(await _context.Vehicles.Where(x => x.IsActive || x.Id == vm.VehicleId).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.VehicleId);
+            vm.StorageLocations = new SelectList(await _context.StorageLocations.Where(x => x.IsActive || x.Id == vm.StorageLocationId).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.StorageLocationId);
+            vm.Statuses = new SelectList(await _context.Statuses.Where(x => x.IsActive || x.Id == vm.StatusId).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.StatusId);
+            vm.FoundByNames = new SelectList(await _context.FoundByNames.Where(x => x.IsActive || x.Id == vm.FoundById).OrderBy(x => x.Name).ToListAsync(), "Id", "Name", vm.FoundById);
         }
 
         private async Task PopulateSearchDropdowns(SearchViewModel vm)

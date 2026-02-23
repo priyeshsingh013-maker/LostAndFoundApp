@@ -70,7 +70,7 @@ namespace LostAndFoundApp.Data
 
                 entity.Property(e => e.DateFound).IsRequired();
                 entity.Property(e => e.LocationFound).IsRequired().HasMaxLength(300);
-                entity.Property(e => e.CreatedDateTime).HasDefaultValueSql("now() at time zone 'utc'");
+                entity.Property(e => e.CreatedDateTime).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 // Index on DateFound for efficient range queries in search
                 entity.HasIndex(e => e.DateFound);
@@ -83,6 +83,7 @@ namespace LostAndFoundApp.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
                 entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
             builder.Entity<Models.Route>(entity =>
@@ -90,6 +91,7 @@ namespace LostAndFoundApp.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
             builder.Entity<Vehicle>(entity =>
@@ -97,6 +99,7 @@ namespace LostAndFoundApp.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
             builder.Entity<StorageLocation>(entity =>
@@ -104,6 +107,7 @@ namespace LostAndFoundApp.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
                 entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
             builder.Entity<Status>(entity =>
@@ -111,6 +115,7 @@ namespace LostAndFoundApp.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
             builder.Entity<FoundByName>(entity =>
@@ -118,6 +123,7 @@ namespace LostAndFoundApp.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
                 entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
             builder.Entity<AdGroup>(entity =>
@@ -125,6 +131,7 @@ namespace LostAndFoundApp.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.GroupName).IsRequired().HasMaxLength(256);
                 entity.HasIndex(e => e.GroupName).IsUnique();
+                entity.Property(e => e.DateAdded).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
         }
     }

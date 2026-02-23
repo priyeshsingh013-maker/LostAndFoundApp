@@ -67,14 +67,17 @@ namespace LostAndFoundApp.Controllers
         public async Task<IActionResult> EditItem(Item model)
         {
             if (!ModelState.IsValid) return View(model);
+            var existing = await _context.Items.FindAsync(model.Id);
+            if (existing == null) return NotFound();
             if (await _context.Items.AnyAsync(x => x.Name == model.Name && x.Id != model.Id))
             {
                 ModelState.AddModelError("Name", "An item with this name already exists.");
                 return View(model);
             }
-            _context.Items.Update(model);
+            existing.Name = model.Name;
+            existing.IsActive = model.IsActive;
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Item '{model.Name}' updated successfully.";
+            TempData["SuccessMessage"] = $"Item '{existing.Name}' updated successfully.";
             return RedirectToAction(nameof(Items));
         }
 
@@ -144,14 +147,17 @@ namespace LostAndFoundApp.Controllers
         public async Task<IActionResult> EditRoute(Models.Route model)
         {
             if (!ModelState.IsValid) return View(model);
+            var existing = await _context.Routes.FindAsync(model.Id);
+            if (existing == null) return NotFound();
             if (await _context.Routes.AnyAsync(x => x.Name == model.Name && x.Id != model.Id))
             {
                 ModelState.AddModelError("Name", "A route with this name already exists.");
                 return View(model);
             }
-            _context.Routes.Update(model);
+            existing.Name = model.Name;
+            existing.IsActive = model.IsActive;
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Route '{model.Name}' updated successfully.";
+            TempData["SuccessMessage"] = $"Route '{existing.Name}' updated successfully.";
             return RedirectToAction(nameof(Routes));
         }
 
@@ -220,14 +226,17 @@ namespace LostAndFoundApp.Controllers
         public async Task<IActionResult> EditVehicle(Vehicle model)
         {
             if (!ModelState.IsValid) return View(model);
+            var existing = await _context.Vehicles.FindAsync(model.Id);
+            if (existing == null) return NotFound();
             if (await _context.Vehicles.AnyAsync(x => x.Name == model.Name && x.Id != model.Id))
             {
                 ModelState.AddModelError("Name", "A vehicle with this name already exists.");
                 return View(model);
             }
-            _context.Vehicles.Update(model);
+            existing.Name = model.Name;
+            existing.IsActive = model.IsActive;
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Vehicle '{model.Name}' updated successfully.";
+            TempData["SuccessMessage"] = $"Vehicle '{existing.Name}' updated successfully.";
             return RedirectToAction(nameof(Vehicles));
         }
 
@@ -296,14 +305,17 @@ namespace LostAndFoundApp.Controllers
         public async Task<IActionResult> EditStorageLocation(StorageLocation model)
         {
             if (!ModelState.IsValid) return View(model);
+            var existing = await _context.StorageLocations.FindAsync(model.Id);
+            if (existing == null) return NotFound();
             if (await _context.StorageLocations.AnyAsync(x => x.Name == model.Name && x.Id != model.Id))
             {
                 ModelState.AddModelError("Name", "A storage location with this name already exists.");
                 return View(model);
             }
-            _context.StorageLocations.Update(model);
+            existing.Name = model.Name;
+            existing.IsActive = model.IsActive;
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Storage Location '{model.Name}' updated successfully.";
+            TempData["SuccessMessage"] = $"Storage Location '{existing.Name}' updated successfully.";
             return RedirectToAction(nameof(StorageLocations));
         }
 
@@ -372,14 +384,17 @@ namespace LostAndFoundApp.Controllers
         public async Task<IActionResult> EditStatus(Status model)
         {
             if (!ModelState.IsValid) return View(model);
+            var existing = await _context.Statuses.FindAsync(model.Id);
+            if (existing == null) return NotFound();
             if (await _context.Statuses.AnyAsync(x => x.Name == model.Name && x.Id != model.Id))
             {
                 ModelState.AddModelError("Name", "A status with this name already exists.");
                 return View(model);
             }
-            _context.Statuses.Update(model);
+            existing.Name = model.Name;
+            existing.IsActive = model.IsActive;
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Status '{model.Name}' updated successfully.";
+            TempData["SuccessMessage"] = $"Status '{existing.Name}' updated successfully.";
             return RedirectToAction(nameof(Statuses));
         }
 
@@ -448,14 +463,17 @@ namespace LostAndFoundApp.Controllers
         public async Task<IActionResult> EditFoundByName(FoundByName model)
         {
             if (!ModelState.IsValid) return View(model);
+            var existing = await _context.FoundByNames.FindAsync(model.Id);
+            if (existing == null) return NotFound();
             if (await _context.FoundByNames.AnyAsync(x => x.Name == model.Name && x.Id != model.Id))
             {
                 ModelState.AddModelError("Name", "This name already exists.");
                 return View(model);
             }
-            _context.FoundByNames.Update(model);
+            existing.Name = model.Name;
+            existing.IsActive = model.IsActive;
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Found By Name '{model.Name}' updated successfully.";
+            TempData["SuccessMessage"] = $"Found By Name '{existing.Name}' updated successfully.";
             return RedirectToAction(nameof(FoundByNames));
         }
 

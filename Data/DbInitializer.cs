@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using LostAndFoundApp.Models;
 
 namespace LostAndFoundApp.Data
@@ -16,6 +17,7 @@ namespace LostAndFoundApp.Data
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
 
             // ─── Seed Roles ────────────────────────────────────────
             string[] roles = { "SuperAdmin", "Supervisor", "User" };
@@ -29,7 +31,7 @@ namespace LostAndFoundApp.Data
 
             // ─── Seed Default Accounts ─────────────────────────────
             // Account 1: Super Admin — full system control
-            await SeedUserAsync(userManager, new SeedAccount
+            await SeedUserAsync(userManager, logger, new SeedAccount
             {
                 UserName = "sadmin",
                 Email = "sadmin@lostandfound.local",
@@ -40,7 +42,7 @@ namespace LostAndFoundApp.Data
             });
 
             // Account 2: Supervisor — operational management
-            await SeedUserAsync(userManager, new SeedAccount
+            await SeedUserAsync(userManager, logger, new SeedAccount
             {
                 UserName = "supervisor",
                 Email = "supervisor@lostandfound.local",
@@ -51,7 +53,7 @@ namespace LostAndFoundApp.Data
             });
 
             // Account 3: User — standard data entry operator
-            await SeedUserAsync(userManager, new SeedAccount
+            await SeedUserAsync(userManager, logger, new SeedAccount
             {
                 UserName = "user",
                 Email = "user@lostandfound.local",
@@ -108,7 +110,7 @@ namespace LostAndFoundApp.Data
         /// <summary>
         /// Creates a user account if it does not already exist, then assigns the specified role.
         /// </summary>
-        private static async Task SeedUserAsync(UserManager<ApplicationUser> userManager, SeedAccount account)
+        private static async Task SeedUserAsync(UserManager<ApplicationUser> userManager, ILogger logger, SeedAccount account)
         {
             var existing = await userManager.FindByNameAsync(account.UserName);
             if (existing != null) return;
@@ -128,6 +130,12 @@ namespace LostAndFoundApp.Data
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, account.Role);
+                logger.LogInformation("Seeded user '{UserName}' with role '{Role}'.", account.UserName, account.Role);
+            }
+            else
+            {
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                logger.LogError("Failed to seed user '{UserName}': {Errors}", account.UserName, errors);
             }
         }
 

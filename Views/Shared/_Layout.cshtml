@@ -101,6 +101,18 @@
                         <strong>Error!</strong> @TempData["ErrorMessage"]
                     </div>
                 }
+                @if (TempData["WarningMessage"] != null)
+                {
+                    <div role="alert" data-variant="warning">
+                        <strong>Warning!</strong> @TempData["WarningMessage"]
+                    </div>
+                }
+                @if (TempData["InfoMessage"] != null)
+                {
+                    <div role="alert" data-variant="info">
+                        <strong>Info:</strong> @TempData["InfoMessage"]
+                    </div>
+                }
                 @RenderBody()
             </div>
         </main>
@@ -109,6 +121,18 @@
 else
 {
     <main class="login-page">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div role="alert" data-variant="error" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 450px;">
+                <strong>Error!</strong> @TempData["ErrorMessage"]
+            </div>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div role="alert" data-variant="info" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 450px;">
+                <strong>Info:</strong> @TempData["InfoMessage"]
+            </div>
+        }
         @RenderBody()
     </main>
 }

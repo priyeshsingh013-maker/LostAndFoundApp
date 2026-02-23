@@ -14,6 +14,6 @@ namespace LostAndFoundApp.Models
         public string GroupName { get; set; } = string.Empty;
 
         [Display(Name = "Date Added")]
-        public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime DateAdded { get; set; }
     }
 }

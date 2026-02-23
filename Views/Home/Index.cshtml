@@ -406,7 +406,7 @@ else
                             <td>@item.DateFound.ToString("MM/dd/yy")</td>
                             <td>@item.ItemName</td>
                             <td>@item.LocationFound</td>
-                            <td><span class="badge @item.StatusName.ToLower()">@item.StatusName</span></td>
+                            <td><span class="badge @item.StatusName?.ToLower()">@item.StatusName</span></td>
                             <td>
                                 @if (item.DaysSinceFound > 30)
                                 {

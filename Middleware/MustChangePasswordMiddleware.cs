@@ -27,10 +27,17 @@ namespace LostAndFoundApp.Middleware
                 {
                     "/account/changepassword",
                     "/account/logout",
+                    "/account/login",
+                    "/account/accessdenied",
+                    "/home/error",
                     "/lib/",
                     "/css/",
                     "/js/",
-                    "/favicon"
+                    "/images/",
+                    "/favicon",
+                    "/_framework/",
+                    "/lostfounditem/photo/",
+                    "/lostfounditem/attachment/"
                 };
 
                 bool isAllowed = allowedPaths.Any(p => path.StartsWith(p));
@@ -42,6 +49,17 @@ namespace LostAndFoundApp.Middleware
 
                     if (user != null && !user.IsAdUser && user.MustChangePassword)
                     {
+                        // For AJAX/API requests, return 401 JSON instead of redirect
+                        // to prevent broken HTML responses in JavaScript
+                        if (IsAjaxRequest(context.Request))
+                        {
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+                            await context.Response.WriteAsync(
+                                "{\"success\":false,\"message\":\"You must change your password before continuing.\",\"redirect\":\"/Account/ChangePassword\"}");
+                            return;
+                        }
+
                         context.Response.Redirect("/Account/ChangePassword");
                         return;
                     }
@@ -49,6 +67,28 @@ namespace LostAndFoundApp.Middleware
             }
 
             await _next(context);
+        }
+
+        /// <summary>
+        /// Detects AJAX requests by checking the X-Requested-With header or Accept header.
+        /// </summary>
+        private static bool IsAjaxRequest(HttpRequest request)
+        {
+            // jQuery/standard AJAX sets this header
+            if (request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                return true;
+
+            // Fetch API or explicit JSON requests
+            var accept = request.Headers["Accept"].ToString();
+            if (accept.Contains("application/json", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            // Content-Type is JSON (POST with JSON body)
+            var contentType = request.ContentType ?? "";
+            if (contentType.Contains("application/json", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
         }
     }
 

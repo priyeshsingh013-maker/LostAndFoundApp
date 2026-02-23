@@ -16,6 +16,7 @@ namespace LostAndFoundApp.Models
         [Required(ErrorMessage = "Date Found is required.")]
         [DataType(DataType.Date)]
         [Display(Name = "Date Found")]
+        [NotFutureDate(ErrorMessage = "Date Found cannot be in the future.")]
         public DateTime DateFound { get; set; }
 
         [Required(ErrorMessage = "Item type is required.")]

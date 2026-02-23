@@ -20,7 +20,7 @@
     <div class="print-report">
         <header>
             <h2>Lost &amp; Found Item Report</h2>
-            <p style="color: #64748b; font-size: 0.9rem;">Generated @DateTime.Now.ToString("MMMM dd, yyyy hh:mm tt")</p>
+            <p style="color: #64748b; font-size: 0.9rem;">Generated @DateTime.UtcNow.ToString("MMMM dd, yyyy hh:mm tt") UTC</p>
         </header>
 
         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">

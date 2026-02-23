@@ -151,7 +151,7 @@ namespace LostAndFoundApp.Controllers
                 {
                     StatusName = s.StatusName,
                     Count = s.Count,
-                    CssClass = s.StatusName.ToLower(),
+                    CssClass = s.StatusName?.ToLower() ?? "unknown",
                     Percentage = total > 0 ? (int)Math.Round((double)s.Count / total * 100) : 0
                 }).OrderByDescending(s => s.Count).ToList();
 
@@ -176,9 +176,14 @@ namespace LostAndFoundApp.Controllers
 
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(int? statusCode = null)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var viewModel = new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                StatusCode = statusCode ?? Response.StatusCode
+            };
+            return View(viewModel);
         }
     }
 }

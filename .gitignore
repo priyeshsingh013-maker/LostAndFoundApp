@@ -35,3 +35,6 @@ bld/
 # Environment files
 appsettings.Development.json
 .env
+
+# Secure file uploads — never commit user data
+SecureStorage/
