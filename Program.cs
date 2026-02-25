@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using LostAndFoundApp.Data;
 using LostAndFoundApp.Models;
@@ -18,33 +17,31 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-// --- Database ---
-// Production: Use PostgreSQL (Render.com DATABASE_URL or appsettings connection string)
-// Development: Use SQLite for zero-setup local development
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+// --- Database (MySQL via Pomelo) ---
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in appsettings.");
 
-if (!string.IsNullOrEmpty(databaseUrl))
+ServerVersion serverVersion;
+try
 {
-    // Production or explicit PostgreSQL override
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(databaseUrl));
+    serverVersion = ServerVersion.AutoDetect(connectionString);
 }
-else if (builder.Environment.IsDevelopment())
+catch (Exception)
 {
-    // Development: SQLite — no PostgreSQL install needed
-    var sqlitePath = Path.Combine(builder.Environment.ContentRootPath, "LostAndFound_Dev.db");
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlite($"Data Source={sqlitePath}"));
-    Log.Information("Using SQLite database at: {Path}", sqlitePath);
+    // Fallback for design-time (EF Core tools) when DB is not running
+    serverVersion = ServerVersion.Parse("8.0.0-mysql");
 }
-else
-{
-    // Production without DATABASE_URL: use configured PostgreSQL connection string
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found and DATABASE_URL not set.");
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString));
-}
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connectionString, serverVersion, mySqlOptions =>
+    {
+        mySqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 3,
+            maxRetryDelay: TimeSpan.FromSeconds(5),
+            errorNumbersToAdd: null);
+    }));
+
+Log.Information("Using MySQL database. Server version: {Version}", serverVersion);
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // --- ASP.NET Core Identity ---
@@ -110,22 +107,14 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// --- Apply Database Schema on Startup ---
+// --- Apply Database Schema on Startup (MySQL migrations) ---
 try
 {
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        if (app.Environment.IsDevelopment() && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL")))
-        {
-            // SQLite in dev: create schema directly from model (no migrations needed)
-            await context.Database.EnsureCreatedAsync();
-        }
-        else
-        {
-            // PostgreSQL in production: run EF Core migrations
-            await context.Database.MigrateAsync();
-        }
+        await context.Database.MigrateAsync();
+        Log.Information("Database migrations applied successfully.");
     }
 }
 catch (Exception ex)
@@ -154,16 +143,6 @@ else
 }
 // Handle 404, 403, etc. with a friendly error page instead of blank/browser-default pages
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
-// --- Forwarded headers for reverse proxy (Render.com) ---
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
 
 app.UseStaticFiles();
 app.UseRouting();
