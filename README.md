@@ -16,9 +16,9 @@ Before you begin, please ensure your Windows machine has the following software 
    * *Important:* When installing, ensure the **"ASP.NET and web development"** workload is checked.
 2. **.NET 8.0 SDK**
    * This is usually installed automatically with recent versions of Visual Studio. 
-3. **A Local MySQL Server**
-   * You must have MySQL running on your computer. You can use **XAMPP**, **MySQL Workbench**, or the standalone **MySQL Community Server**.
-   * *Note: Please ensure the MySQL service is actively running before proceeding.*
+3. **A Local Microsoft SQL Server**
+   * You must have Microsoft SQL Server running on your computer. You can use **SQL Server 2022 Express** or **LocalDB**.
+   * *Note: Please ensure the SQL Server service (e.g., SQLEXPRESS) is actively running before proceeding.*
 
 ---
 
@@ -46,20 +46,19 @@ If you are downloading the source code directly from GitHub as a ZIP file, pleas
 
 ---
 
-## 🗄️ Step 3: Configure Your MySQL Connection
+## 🗄️ Step 3: Configure Your MSSQL Connection
 
-You need to tell the application how to talk to your local MySQL server.
+You need to tell the application how to talk to your local Microsoft SQL Server.
 
 1. On the right side of Visual Studio, look at the **Solution Explorer** panel.
 2. Find and double-click the **`appsettings.json`** file to open it.
 3. At the very top of the file, you will see the `"ConnectionStrings"` section:
    ```json
    "ConnectionStrings": {
-     "DefaultConnection": "Server=localhost;Port=3306;Database=LostAndFoundDb;User=root;Password=your_password_here;"
+     "DefaultConnection": "Server=.\\SQLEXPRESS;Database=LostAndFoundDb;Trusted_Connection=True;TrustServerCertificate=True;"
    }
    ```
-4. **Action Required:** Update the `User` and `Password` to match your local MySQL Server credentials.
-   * *Tip:* If you are using a default local install like XAMPP, the username is usually `root` and the password is left entirely blank. If so, it should look exactly like this: `User=root;Password=;`
+4. **Action Required:** Most local SQL Express installations use `.\SQLEXPRESS`. If you are using LocalDB, change the Server value to `(localdb)\\MSSQLLocalDB`. With `Trusted_Connection=True`, it uses your standard Windows account to securely connect, so no separate database username or password is required!
 
 ---
 
@@ -78,7 +77,7 @@ You are now ready to start the app! Let's hit play.
 
 As soon as you click Play, a black console window will open. Here is what the application does automatically for you on its very first run:
 
-* **Creates the Database:** It talks to your MySQL Server and creates a brand-new database called `LostAndFoundDb`.
+* **Creates the Database:** It talks to your MSSQL Server and creates a brand-new database called `LostAndFoundDb`.
 * **Builds the Tables:** It automatically generates all the required SQL tables (Users, Items, Categories, etc.) without you having to run any manual SQL scripts.
 * **Seeds Default Data:** Because the setting `SEED_DATABASE=true` is enabled behind the scenes, the app instantly populates the database with default test data and the SuperAdmin account so the app is immediately usable.
 
@@ -94,5 +93,5 @@ As soon as you click Play, a black console window will open. Here is what the ap
 ---
 
 ### 🛑 Troubleshooting Quick-Check
-* **The app crashes instantly when I press Play:** Double-check that your MySQL server (via the XAMPP Control Panel or Windows Services) is actually turned **ON** and running.
-* **Database Connection Error:** Verify that the username and password you typed into Step 3 (`appsettings.json`) are perfectly correct.
+* **The app crashes instantly when I press Play:** Double-check that your MSSQL server (via SQL Server Configuration Manager or Windows Services) is actually turned **ON** and running.
+* **Database Connection Error:** Verify that the server instance name in Step 3 (`appsettings.json`) matches your installed MSSQL Server (e.g., `.\SQLEXPRESS` or `(localdb)\MSSQLLocalDB`).

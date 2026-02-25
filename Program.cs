@@ -17,31 +17,20 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-// --- Database (MySQL via Pomelo) ---
+// --- Database (MSSQL via Entity Framework Core) ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in appsettings.");
 
-ServerVersion serverVersion;
-try
-{
-    serverVersion = ServerVersion.AutoDetect(connectionString);
-}
-catch (Exception)
-{
-    // Fallback for design-time (EF Core tools) when DB is not running
-    serverVersion = ServerVersion.Parse("8.0.0-mysql");
-}
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, serverVersion, mySqlOptions =>
+    options.UseSqlServer(connectionString, sqlOptions =>
     {
-        mySqlOptions.EnableRetryOnFailure(
+        sqlOptions.EnableRetryOnFailure(
             maxRetryCount: 3,
             maxRetryDelay: TimeSpan.FromSeconds(5),
             errorNumbersToAdd: null);
     }));
 
-Log.Information("Using MySQL database. Server version: {Version}", serverVersion);
+Log.Information("Using MSSQL database.");
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // --- ASP.NET Core Identity ---
@@ -107,7 +96,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// --- Apply Database Schema on Startup (MySQL migrations) ---
+// --- Apply Database Schema on Startup (MSSQL migrations) ---
 try
 {
     using (var scope = app.Services.CreateScope())
