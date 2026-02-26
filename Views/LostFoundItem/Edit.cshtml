@@ -1,0 +1,141 @@
+@model LostFoundItemEditViewModel
+@{
+    ViewData["Title"] = $"Edit Record #{Model.TrackingId}";
+}
+
+<div class="page-header">
+    <div class="container-fluid px-4">
+        <h1><i class="bi bi-pencil-square me-2"></i>Edit Record #@Model.TrackingId</h1>
+        <p class="subtitle mb-0">Update the details for this record</p>
+    </div>
+</div>
+
+<div class="container-fluid px-4">
+    <div class="card fade-in-up">
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="TrackingId" />
+                <input type="hidden" asp-for="CreatedBy" />
+                <input type="hidden" asp-for="CreatedDateTime" />
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="DateFound" class="form-label">Date Found *</label>
+                        <input asp-for="DateFound" class="form-control" type="date" />
+                        <span asp-validation-for="DateFound" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="ItemId" class="form-label">Item Type *</label>
+                        <div class="d-flex">
+                            <select asp-for="ItemId" asp-items="Model.Items" class="form-select">
+                                <option value="">Select item type...</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-inline-create data-target-select="ItemId" data-endpoint="@Url.Action("AddItemAjax", "MasterData")" data-label="item type" title="Add new item type"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="StatusId" class="form-label">Status *</label>
+                        <div class="d-flex">
+                            <select asp-for="StatusId" asp-items="Model.Statuses" class="form-select">
+                                <option value="">Select status...</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-inline-create data-target-select="StatusId" data-endpoint="@Url.Action("AddStatusAjax", "MasterData")" data-label="status" title="Add new status"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label asp-for="LocationFound" class="form-label">Location Found *</label>
+                        <input asp-for="LocationFound" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="StatusDate" class="form-label">Status Date</label>
+                        <input asp-for="StatusDate" class="form-control" type="date" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="RouteId" class="form-label">Route #</label>
+                        <div class="d-flex">
+                            <select asp-for="RouteId" asp-items="Model.Routes" class="form-select">
+                                <option value="">Select route...</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-inline-create data-target-select="RouteId" data-endpoint="@Url.Action("AddRouteAjax", "MasterData")" data-label="route" title="Add new route"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="VehicleId" class="form-label">Vehicle #</label>
+                        <div class="d-flex">
+                            <select asp-for="VehicleId" asp-items="Model.Vehicles" class="form-select">
+                                <option value="">Select vehicle...</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-inline-create data-target-select="VehicleId" data-endpoint="@Url.Action("AddVehicleAjax", "MasterData")" data-label="vehicle" title="Add new vehicle"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="StorageLocationId" class="form-label">Storage Location</label>
+                        <div class="d-flex">
+                            <select asp-for="StorageLocationId" asp-items="Model.StorageLocations" class="form-select">
+                                <option value="">Select location...</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-inline-create data-target-select="StorageLocationId" data-endpoint="@Url.Action("AddStorageLocationAjax", "MasterData")" data-label="storage location" title="Add new storage location"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="FoundById" class="form-label">Found By</label>
+                        <div class="d-flex">
+                            <select asp-for="FoundById" asp-items="Model.FoundByNames" class="form-select">
+                                <option value="">Select person...</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-inline-create data-target-select="FoundById" data-endpoint="@Url.Action("AddFoundByNameAjax", "MasterData")" data-label="found by name" title="Add new found by name"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="ClaimedBy" class="form-label">Claimed By</label>
+                        <input asp-for="ClaimedBy" class="form-control" />
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Notes" class="form-label">Notes</label>
+                        <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PhotoFile" class="form-label">Replace Photo</label>
+                        <input asp-for="PhotoFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif" />
+                        @if (!string.IsNullOrEmpty(Model.ExistingPhotoPath))
+                        {
+                            <div class="form-text text-success"><i class="bi bi-check-circle"></i> Current photo attached</div>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="AttachmentFile" class="form-label">Replace Attachment</label>
+                        <input asp-for="AttachmentFile" class="form-control" type="file" />
+                        @if (!string.IsNullOrEmpty(Model.ExistingAttachmentPath))
+                        {
+                            <div class="form-text text-success"><i class="bi bi-check-circle"></i> Current attachment attached</div>
+                        }
+                    </div>
+                </div>
+
+                <hr style="margin: 24px 0;" />
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Details" asp-route-id="@Model.TrackingId" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-lg"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
